@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/ItzJessie/library/static/css/main.f970e91f.css",
+    "main.js": "/ItzJessie/library/static/js/main.39595ba7.js",
+    "index.html": "/ItzJessie/library/index.html",
+    "main.f970e91f.css.map": "/ItzJessie/library/static/css/main.f970e91f.css.map",
+    "main.39595ba7.js.map": "/ItzJessie/library/static/js/main.39595ba7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f970e91f.css",
+    "static/js/main.39595ba7.js"
+  ]
+}
