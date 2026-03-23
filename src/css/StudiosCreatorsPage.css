@@ -1,0 +1,4 @@
+/* Standalone stylesheet for the Studios & Creators page */
+.page-studios {
+    min-height: calc(100vh - 240px);
+}

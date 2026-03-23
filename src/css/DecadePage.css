@@ -1,0 +1,4 @@
+/* Standalone stylesheet for all decade detail pages */
+.decade-page {
+    min-height: calc(100vh - 120px);
+}

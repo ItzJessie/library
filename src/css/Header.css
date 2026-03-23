@@ -1,0 +1,37 @@
+/* Component-level header layout refinements layered over Site.css */
+.header-inner {
+    align-items: center;
+}
+
+.brand {
+    min-width: 0;
+}
+
+.brand-title {
+    display: block;
+    line-height: 1.1;
+}
+
+@media (max-width: 1024px) {
+    .brand-title {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 720px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .brand {
+        justify-content: center;
+    }
+
+    .brand-title {
+        text-align: center;
+        font-size: 1rem;
+    }
+}

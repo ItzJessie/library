@@ -1,0 +1,4 @@
+/* Standalone stylesheet for the All Influential Series page */
+.all-series-page {
+    min-height: calc(100vh - 180px);
+}

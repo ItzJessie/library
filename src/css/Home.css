@@ -1,0 +1,60 @@
+/* Standalone stylesheet for the Home page */
+.page-home {
+    min-height: calc(100vh - 240px);
+}
+
+.media-section {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+    padding: 1.75rem;
+    border-radius: 16px;
+    background: rgba(255, 252, 248, 0.78);
+    border: 1px solid rgba(90, 64, 38, 0.14);
+    box-shadow: 0 10px 24px rgba(70, 45, 22, 0.12);
+}
+
+.media-description {
+    margin-top: 0.5rem;
+    color: rgba(45, 31, 22, 0.82);
+}
+
+.media-grid {
+    margin-top: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.media-card {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid rgba(90, 64, 38, 0.16);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.media-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.media-card h3 {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+    .media-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .media-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-section {
+        padding: 1.2rem;
+    }
+}

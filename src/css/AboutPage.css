@@ -1,0 +1,4 @@
+/* Standalone stylesheet for the About page */
+.about-page {
+    min-height: calc(100vh - 240px);
+}

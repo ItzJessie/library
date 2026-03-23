@@ -1,13 +1,15 @@
 import {Outlet} from "react-router-dom";
+import Header from "./components/header";
+import Footer from "./components/Footer";
 
 const Layout = () => {
     return (
-        <div id="content">
-            <h1>My App</h1>
+        <>
+            <div className="mouse-glow" aria-hidden="true"></div>
+            <Header />
             <Outlet />
-
-            <p>Footer</p>
-        </div>
+            <Footer />
+        </>
     );
 };
 
