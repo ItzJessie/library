@@ -2,3 +2,8 @@
 .series-hero {
     min-height: 220px;
 }
+
+.series-card-link {
+    color: inherit;
+    text-decoration: none;
+}

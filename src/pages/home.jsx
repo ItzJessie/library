@@ -2,6 +2,8 @@ import "../css/Home.css";
 import { Link } from "react-router-dom";
 import HomeFeatureCard from "../components/HomeFeatureCard";
 import HomeArchiveCard from "../components/HomeArchiveCard";
+import ContactForm from "../components/ContactForm";
+import { useEraInteractions } from "../hooks/useEraInteractions";
 
 const featuredCards = [
     {
@@ -63,6 +65,8 @@ const archiveCards = [
 ];
 
 const Home = () => {
+    useEraInteractions();
+
     return (
         <main className="page-home">
             <section className="hero">
@@ -107,6 +111,24 @@ const Home = () => {
                         <p>1917 - 1930s - 1960s - 1980s - 2000s - 2020s</p>
                     </div>
                 </aside>
+
+                <section className="video-section reveal reveal-up" aria-labelledby="video-feature-heading">
+                    <h2 id="video-feature-heading">Watch: The Evolution of Anime</h2>
+                    <p className="video-description">
+                        Discover how Japanese animation evolved from its earliest roots to modern masterpieces.
+                    </p>
+                    <div className="video-wrapper">
+                        <iframe
+                            src="https://www.youtube.com/embed/cqoURVPgGPo?si=gg7LjipTFIqR7Nss"
+                            title="YouTube video: The Evolution of Anime"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                </section>
+
+                <ContactForm />
 
             </section>
         </main>

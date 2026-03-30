@@ -1,4 +1,9 @@
-const SeriesListCard = ({ series, compact = false, variant = "default" }) => {
+const SeriesListCard = ({
+    series,
+    compact = false,
+    variant = "default",
+    interactive = null
+}) => {
     if (compact) {
         return (
             <article className="carousel-card tilt-card" id={series.id}>
@@ -9,8 +14,18 @@ const SeriesListCard = ({ series, compact = false, variant = "default" }) => {
     }
 
     if (variant === "archive") {
+        const interactiveProps = interactive
+            ? {
+                  onClick: interactive.onClick,
+                  onKeyDown: interactive.onKeyDown,
+                  tabIndex: interactive.tabIndex,
+                  role: interactive.role,
+                  "aria-label": interactive.ariaLabel
+              }
+            : {};
+
         return (
-            <article className="series-card tilt-card" id={series.id}>
+            <article className="series-card tilt-card" id={series.id} {...interactiveProps}>
                 <img src={series.image} alt={series.title} />
                 <span>{series.title}</span>
                 <div className="series-info" aria-hidden="true">

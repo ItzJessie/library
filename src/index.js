@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './index.css';
+import './css/styles.css';
 import Layout from "./Layout";
 import Home from "./pages/home";
 import About from "./pages/About";
@@ -14,6 +14,8 @@ import DecadePage from "./pages/DecadePage";
 
 
 const App = () => {
+
+  
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Routes>

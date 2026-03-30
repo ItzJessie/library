@@ -4,9 +4,17 @@
     justify-content: flex-end;
 }
 
+.nav-toggle {
+    display: none;
+}
+
 .main-nav a {
     border-radius: 8px;
     padding-inline: 0.4rem;
+}
+
+.hide-small {
+    display: none;
 }
 
 .main-nav a:focus-visible {

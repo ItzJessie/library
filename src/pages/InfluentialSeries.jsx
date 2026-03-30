@@ -1,21 +1,218 @@
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import SeriesListCard from "../components/SeriesListCard";
+import Slideshow from "../components/Slideshow";
 import { archiveSeries, featuredSeries } from "../data/siteData";
+import { useEraInteractions } from "../hooks/useEraInteractions";
 import "../css/InfluentialSeriesPage.css";
 
+const animeDatabase = [
+    { name: "Attack on Titan", id: "series-attack-on-titan" },
+    { name: "Frieren", id: "series-frieren" },
+    { name: "One Piece", id: "series-one-piece" },
+    { name: "Death Note", id: "series-death-note" },
+    { name: "Vinland Saga", id: "series-vinland-saga" },
+    { name: "Psycho Pass", id: "series-psycho-pass" },
+    { name: "Demon Slayer", id: "series-demon-slayer" },
+    { name: "Fullmetal Alchemist", id: "series-fullmetal-alchemist" },
+    { name: "Hunter x Hunter", id: "series-hunter-x-hunter" },
+    { name: "One Punch Man", id: "series-one-punch-man" },
+    { name: "Chainsaw Man", id: "series-chainsaw-man" },
+    { name: "JoJo's Bizarre Adventure", id: "series-jojo-bizarre-adventure" },
+    { name: "Bleach", id: "series-bleach" },
+    { name: "Cyberpunk: Edgerunners", id: "series-cyberpunk-edgerunners" },
+    { name: "Code Geass", id: "series-code-geass" },
+    { name: "Princess Mononoke", id: "series-princess-mononoke" },
+    { name: "Cowboy Bebop", id: "series-cowboy-bebop" },
+    { name: "Dandadan", id: "series-dandadan" },
+    { name: "Dragon Ball Z", id: "series-dragon-ball-z" },
+    { name: "Steins;Gate", id: "series-steins-gate" },
+    { name: "Spy x Family", id: "series-spy-family" },
+    { name: "Ghost in the Shell", id: "series-ghost-in-the-shell" },
+    { name: "Pokemon", id: "series-pokemon" },
+    { name: "Mushoku Tensei", id: "series-mushoku-tensei" },
+    { name: "Mob Psycho 100", id: "series-mob-psycho-100" },
+    { name: "Tokyo Ghoul", id: "series-tokyo-ghoul" },
+    { name: "Hellsing", id: "series-hellsing" }
+];
+
 const InfluentialSeries = () => {
+    const navigate = useNavigate();
+    useEraInteractions();
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+    const searchFormRef = useRef(null);
+
+    const trimmedSearchTerm = searchTerm.toLowerCase().trim();
+
+    const archiveTitleMatches = useMemo(
+        () =>
+            archiveSeries.some((series) =>
+                series.title.toLowerCase().includes(trimmedSearchTerm)
+            ),
+        [trimmedSearchTerm]
+    );
+
+    const featuredTitleMatches = useMemo(
+        () =>
+            featuredSeries.some((series) =>
+                series.title.toLowerCase().includes(trimmedSearchTerm)
+            ),
+        [trimmedSearchTerm]
+    );
+
+    const hasVisibleCards =
+        trimmedSearchTerm.length === 0 || archiveTitleMatches || featuredTitleMatches;
+
+    const suggestions = useMemo(() => {
+        if (trimmedSearchTerm.length < 1) {
+            return [];
+        }
+
+        return animeDatabase
+            .filter((anime) => anime.name.toLowerCase().includes(trimmedSearchTerm))
+            .slice(0, 6);
+    }, [trimmedSearchTerm]);
+
+    const showSuggestions = isSearchFocused && suggestions.length > 0;
+
+    useEffect(() => {
+        const seriesCards = Array.from(document.querySelectorAll(".series-card"));
+        const carouselCards = Array.from(document.querySelectorAll(".carousel-card"));
+        const allCards = [...seriesCards, ...carouselCards];
+
+        allCards.forEach((card) => {
+            const animeTitle =
+                card.querySelector("span")?.textContent?.toLowerCase() ||
+                card.querySelector("h2")?.textContent?.toLowerCase() ||
+                "";
+            const matches = animeTitle.includes(trimmedSearchTerm);
+
+            if (trimmedSearchTerm.length === 0 || matches) {
+                card.style.display = "";
+                card.style.opacity = "1";
+                card.style.pointerEvents = "auto";
+            } else {
+                card.style.opacity = "0.2";
+                card.style.pointerEvents = "none";
+            }
+        });
+    }, [trimmedSearchTerm]);
+
+    useEffect(() => {
+        const handleDocumentClick = (event) => {
+            if (!searchFormRef.current?.contains(event.target)) {
+                setIsSearchFocused(false);
+                setSelectedSuggestionIndex(-1);
+            }
+        };
+
+        document.addEventListener("click", handleDocumentClick);
+        return () => {
+            document.removeEventListener("click", handleDocumentClick);
+        };
+    }, []);
+
+    const navigateToAnime = (anime) => {
+        navigate(`/all-influential-series#${anime.id}`);
+        setIsSearchFocused(false);
+        setSelectedSuggestionIndex(-1);
+    };
+
+    const handleKeyNavigation = (event) => {
+        if (!showSuggestions) {
+            if (event.key === "Escape") {
+                setIsSearchFocused(false);
+            }
+            return;
+        }
+
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setSelectedSuggestionIndex((prev) =>
+                Math.min(prev + 1, suggestions.length - 1)
+            );
+        } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            setSelectedSuggestionIndex((prev) => Math.max(prev - 1, -1));
+        } else if (event.key === "Enter") {
+            event.preventDefault();
+            if (selectedSuggestionIndex >= 0) {
+                const selectedAnime = suggestions[selectedSuggestionIndex];
+                if (selectedAnime) {
+                    navigateToAnime(selectedAnime);
+                }
+            }
+        } else if (event.key === "Escape") {
+            setIsSearchFocused(false);
+            setSelectedSuggestionIndex(-1);
+        }
+    };
+
     return (
         <main>
             <section className="series-hero reveal">
                 <div className="series-search-wrap">
-                    <form className="series-search" aria-label="Search anime" onSubmit={(event) => event.preventDefault()}>
-                        <input type="search" name="search" placeholder="search anime" />
+                    <form
+                        className="series-search"
+                        aria-label="Search anime"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                        }}
+                        ref={searchFormRef}
+                    >
+                        <input
+                            type="search"
+                            name="search"
+                            placeholder="search anime"
+                            value={searchTerm}
+                            onChange={(event) => {
+                                setSearchTerm(event.target.value);
+                                setSelectedSuggestionIndex(-1);
+                            }}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onKeyDown={handleKeyNavigation}
+                        />
                         <button type="submit" aria-label="Search">
                             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <circle cx="11" cy="11" r="7"></circle>
                                 <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
                             </svg>
                         </button>
+
+                        {showSuggestions && (
+                            <div className="search-suggestions">
+                                {suggestions.map((anime, index) => (
+                                    <div
+                                        className={`suggestion-item ${
+                                            selectedSuggestionIndex === index
+                                                ? "selected"
+                                                : ""
+                                        }`.trim()}
+                                        key={anime.id}
+                                        onClick={() => navigateToAnime(anime)}
+                                        onMouseEnter={() =>
+                                            setSelectedSuggestionIndex(index)
+                                        }
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(event) => {
+                                            if (
+                                                event.key === "Enter" ||
+                                                event.key === " "
+                                            ) {
+                                                event.preventDefault();
+                                                navigateToAnime(anime);
+                                            }
+                                        }}
+                                    >
+                                        {anime.name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </form>
                 </div>
                 <div className="series-hero-inner">
@@ -24,25 +221,12 @@ const InfluentialSeries = () => {
             </section>
 
             <section className="series-carousel">
-                <div className="carousel-shell reveal">
-                    <div className="carousel-progress" aria-hidden="true">
-                        <span className="carousel-progress__bar"></span>
-                    </div>
-                    <button className="carousel-arrow" aria-label="Previous" type="button">
-                        <span aria-hidden="true">&#8249;</span>
-                    </button>
-                    <div className="carousel-track">
-                        {featuredSeries.map((series) => (
-                            <SeriesListCard key={series.id} series={{
-                                ...series,
-                                image: `${process.env.PUBLIC_URL}/${series.image}`
-                            }} compact />
-                        ))}
-                    </div>
-                    <button className="carousel-arrow" aria-label="Next" type="button">
-                        <span aria-hidden="true">&#8250;</span>
-                    </button>
-                </div>
+                <Slideshow
+                    slides={featuredSeries.map((series) => ({
+                        ...series,
+                        image: `${process.env.PUBLIC_URL}/${series.image}`
+                    }))}
+                />
             </section>
 
             <section className="series-archive">
@@ -60,9 +244,32 @@ const InfluentialSeries = () => {
                                     image: `${process.env.PUBLIC_URL}/${series.image}`
                                 }}
                                 variant="archive"
+                                interactive={{
+                                    tabIndex: 0,
+                                    role: "link",
+                                    ariaLabel: `Open ${series.title || "series"} in archive`,
+                                    onClick: () => navigate("/all-influential-series"),
+                                    onKeyDown: (event) => {
+                                        if (event.key === "Enter" || event.key === " ") {
+                                            event.preventDefault();
+                                            navigate("/all-influential-series");
+                                        }
+                                    }
+                                }}
                             />
                         ))}
                     </div>
+
+                    {trimmedSearchTerm.length > 0 && !hasVisibleCards && (
+                        <div className="series-no-results" style={{ display: "block" }}>
+                            <p>
+                                No anime found matching "<strong>{trimmedSearchTerm}</strong>"
+                            </p>
+                            <p className="coming-soon">
+                                New anime series coming soon! Stay tuned 🎬
+                            </p>
+                        </div>
+                    )}
                 </div>
             </section>
         </main>

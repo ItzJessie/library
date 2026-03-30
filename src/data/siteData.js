@@ -5,7 +5,35 @@ export const eraPanels = [
         blurb: "Anime gains global popularity, introducing new genres and transforming the industry.",
         featured: "City Hunter",
         years: "1985-1991",
-        related: ["Akira", "Dragon Ball", "Dragon Ball Z"]
+        related: ["Akira", "Dragon Ball", "Dragon Ball Z"],
+        keyDevelopments: [
+            "Mecha, cyberpunk, and shounen titles like Gundam and Dragon Ball rise in popularity",
+            "OVA (Original Video Animation) launches, allowing for more experimental and mature content",
+            "High-budget, artistically ambitious films like Akira push the boundaries of animation",
+            "Anime gains widespread, international audiences as it moves beyond Japan"
+        ],
+        influentialSeries: [
+            {
+                year: 1982,
+                title: "Super Dimension Fortress Macross",
+                description: "A spacefaring mecha series that pioneered variable fighters and romantic drama."
+            },
+            {
+                year: 1984,
+                title: "Dragon Ball",
+                description: "A shounen action-adventure that became a global phenomenon and defined the genre."
+            },
+            {
+                year: 1987,
+                title: "Akira",
+                description: "A cyberpunk masterpiece that revolutionized anime animation and storytelling."
+            },
+            {
+                year: 1988,
+                title: "Gundam Wing",
+                description: "A mecha series featuring a complex political narrative and global appeal."
+            }
+        ]
     },
     {
         id: "1990s",
@@ -13,7 +41,35 @@ export const eraPanels = [
         blurb: "A golden era of shounen and shoujo hits that captured worldwide audiences.",
         featured: "Sailor Moon",
         years: "1992-1997",
-        related: ["Sailor Moon", "Cowboy Bebop", "Neon Genesis Evangelion"]
+        related: ["Sailor Moon", "Cowboy Bebop", "Neon Genesis Evangelion"],
+        keyDevelopments: [
+            "Magical girl and romance-driven shoujo series achieve massive popularity worldwide",
+            "Shounen action franchises continue to dominate with strong character development",
+            "The emergence of cyberpunk and noir-themed anime targeting adult audiences",
+            "Home video releases and international distribution significantly expand anime's reach"
+        ],
+        influentialSeries: [
+            {
+                year: 1992,
+                title: "Sailor Moon",
+                description: "A magical girl phenomenon that captured worldwide audiences and defined an era."
+            },
+            {
+                year: 1994,
+                title: "Neon Genesis Evangelion",
+                description: "A groundbreaking mecha series known for psychological depth and complex narrative."
+            },
+            {
+                year: 1995,
+                title: "Rurouni Kenshin",
+                description: "A historical shounen action series balancing comedy, action, and emotional depth."
+            },
+            {
+                year: 1998,
+                title: "Cowboy Bebop",
+                description: "A space noir series that became iconic for its jazz-influenced aesthetic and storytelling."
+            }
+        ]
     },
     {
         id: "2000s",
@@ -21,7 +77,35 @@ export const eraPanels = [
         blurb: "A boom period bringing new animation styles and breakout franchises.",
         featured: "Naruto",
         years: "2002-2007",
-        related: ["Naruto", "Fullmetal Alchemist", "Bleach"]
+        related: ["Naruto", "Fullmetal Alchemist", "Bleach"],
+        keyDevelopments: [
+            "The rise of long-running shounen series with continuous manga serialization",
+            "Improved digital animation techniques allowing for more fluid action sequences",
+            "International anime streaming platforms begin to emerge, expanding accessibility",
+            "Anime conventions and fan communities solidify in Western countries"
+        ],
+        influentialSeries: [
+            {
+                year: 2000,
+                title: "Fullmetal Alchemist",
+                description: "An intricate fantasy series with complex mythology and strong character interactions."
+            },
+            {
+                year: 2001,
+                title: "Bleach",
+                description: "A supernatural action series that captivated audiences with its visual style."
+            },
+            {
+                year: 2002,
+                title: "Naruto",
+                description: "A landmark shounen series that defined the 2000s with its compelling protagonist journey."
+            },
+            {
+                year: 2005,
+                title: "Death Note",
+                description: "A psychological thriller that captured international audiences with its unique premise."
+            }
+        ]
     },
     {
         id: "2010s",
@@ -29,7 +113,35 @@ export const eraPanels = [
         blurb: "Highly polished, diverse series dominated the anime landscape.",
         featured: "Steins;Gate",
         years: "2011",
-        related: ["Steins;Gate", "My Hero Academia", "One Punch Man"]
+        related: ["Steins;Gate", "My Hero Academia", "One Punch Man"],
+        keyDevelopments: [
+            "Streaming services like Netflix and Crunchyroll revolutionize global anime distribution",
+            "Animation studios focus on higher production quality and diverse storytelling",
+            "The rise of both indie anime and massive studio productions with cinematic quality",
+            "Anime becomes a mainstream medium recognized at international film festivals"
+        ],
+        influentialSeries: [
+            {
+                year: 2010,
+                title: "Steins;Gate",
+                description: "A sci-fi time-travel thriller praised for complex plotting and character development."
+            },
+            {
+                year: 2011,
+                title: "Attack on Titan",
+                description: "An action-packed thriller that became a global phenomenon with stunning visuals."
+            },
+            {
+                year: 2016,
+                title: "My Hero Academia",
+                description: "A superhero series that defined the late 2010s with engaging characters and narrative."
+            },
+            {
+                year: 2015,
+                title: "One Punch Man",
+                description: "A unique take on the superhero genre with stunning animation and clever humor."
+            }
+        ]
     },
     {
         id: "2020s",
@@ -37,7 +149,35 @@ export const eraPanels = [
         blurb: "Anime flourishes through streaming, new technologies, and mature themes.",
         featured: "Jujutsu Kaisen",
         years: "2020-current",
-        related: ["Chainsaw Man", "Cyberpunk: Edgerunners", "Spy x Family"]
+        related: ["Chainsaw Man", "Cyberpunk: Edgerunners", "Spy x Family"],
+        keyDevelopments: [
+            "Streaming platforms become the primary distribution method for new anime",
+            "Studio investment increases with focus on spectacular animation and visual effects",
+            "Anime continues to push boundaries with mature themes and complex narratives",
+            "International collaborations and co-productions become increasingly common"
+        ],
+        influentialSeries: [
+            {
+                year: 2020,
+                title: "Jujutsu Kaisen",
+                description: "A dark fantasy action series with exceptional animation and engaging mythology."
+            },
+            {
+                year: 2020,
+                title: "Tower of God",
+                description: "A Korean webtoon adaptation that represents the rise of international anime collaborations."
+            },
+            {
+                year: 2022,
+                title: "Chainsaw Man",
+                description: "A gritty dark fantasy series with innovative animation techniques and mature storytelling."
+            },
+            {
+                year: 2022,
+                title: "Cyberpunk: Edgerunners",
+                description: "A Netflix original that blends cyberpunk aesthetics with emotional storytelling."
+            }
+        ]
     }
 ];
 
@@ -164,7 +304,7 @@ export const featuredSeries = [
     {
         id: "series-fullmetal-alchemist",
         title: "Fullmetal Alchemist",
-        image: "images/full-metal-alchemist-500x750.jpg",
+        image: "images/fullmetal-alchemist-1280×720px.jpg",
         year: 2003,
         studio: "Bones",
         genre: "Action, dark fantasy"
@@ -194,6 +334,14 @@ export const featuredSeries = [
         genre: "Action, dark fantasy"
     },
     {
+        id: "series-jojo-bizarre-adventure",
+        title: "JoJo's Bizarre Adventure",
+        image: "images/jojo-bizarre-adventure-1280-720.jpg",
+        year: 2012,
+        studio: "David Production",
+        genre: "Action, adventure"
+    },
+    {
         id: "series-bleach",
         title: "Bleach",
         image: "images/bleach-1280x720.jpg",
@@ -208,14 +356,6 @@ export const featuredSeries = [
         year: 2022,
         studio: "Trigger",
         genre: "Sci-fi, action"
-    },
-    {
-        id: "series-cowboy-bebop",
-        title: "Cowboy Bebop",
-        image: "images/cowboy-1280x720.jpg",
-        year: 1998,
-        studio: "Sunrise",
-        genre: "Neo-noir, space western"
     }
 ];
 
@@ -267,7 +407,7 @@ export const archiveSeries = [
     },
     {
         id: "series-psycho-pass",
-        title: "Psycho-Pass",
+        title: "Psycho Pass",
         image: "images/psychopass-400x300.jpg",
         year: 2012,
         studio: "Production I.G",

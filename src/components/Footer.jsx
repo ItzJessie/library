@@ -1,26 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../css/Footer.css";
+import ThemeToggle from "./ThemeToggle";
 
 const Footer = () => {
-	const [isDarkMode, setIsDarkMode] = useState(false);
-
-	useEffect(() => {
-		const savedTheme = localStorage.getItem("theme");
-		const darkModeEnabled = savedTheme === "dark";
-		setIsDarkMode(darkModeEnabled);
-		document.body.classList.toggle("theme-dark", darkModeEnabled);
-	}, []);
-
-	useEffect(() => {
-		document.body.classList.toggle("theme-dark", isDarkMode);
-		localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-	}, [isDarkMode]);
-
-	const handleThemeToggle = () => {
-		setIsDarkMode((prev) => !prev);
-	};
-
 	return (
 		<footer className="site-footer">
 			<div className="footer-inner">
@@ -40,20 +22,7 @@ const Footer = () => {
 							<span>|</span>
 							<Link to="/about">References</Link>
 						</div>
-						<button
-							className="theme-toggle"
-							type="button"
-							onClick={handleThemeToggle}
-							aria-pressed={isDarkMode}
-							aria-label={
-								isDarkMode ? "Switch to light mode" : "Switch to dark mode"
-							}
-						>
-							<span className="theme-toggle__label">
-								{isDarkMode ? "Light Mode" : "Dark Mode"}
-							</span>
-							<span className="theme-toggle__icon" aria-hidden="true"></span>
-						</button>
+						<ThemeToggle />
 					</div>
 				</div>
 			</div>
