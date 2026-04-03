@@ -119,7 +119,7 @@ const Home = () => {
                     </p>
                     <div className="video-wrapper">
                         <iframe
-                            src="https://www.youtube.com/embed/cqoURVPgGPo?si=gg7LjipTFIqR7Nss"
+                            src="https://www.youtube.com/embed/cqoURVPgGPo"
                             title="YouTube video: The Evolution of Anime"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerPolicy="strict-origin-when-cross-origin"

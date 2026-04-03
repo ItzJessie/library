@@ -43,6 +43,8 @@ const InfluentialSeries = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+    const [activeArchiveFilter, setActiveArchiveFilter] = useState("All");
+    const [archiveRotationIndex, setArchiveRotationIndex] = useState(0);
     const searchFormRef = useRef(null);
 
     const trimmedSearchTerm = searchTerm.toLowerCase().trim();
@@ -77,6 +79,77 @@ const InfluentialSeries = () => {
     }, [trimmedSearchTerm]);
 
     const showSuggestions = isSearchFocused && suggestions.length > 0;
+
+    const archiveFilters = ["All", "Classics", "Modern Hits", "Underrated", "Global Impact"];
+
+    const filteredArchiveSeries = useMemo(() => {
+        if (activeArchiveFilter === "All") {
+            return archiveSeries;
+        }
+
+        if (activeArchiveFilter === "Classics") {
+            return archiveSeries.filter((series) => series.year <= 2009);
+        }
+
+        if (activeArchiveFilter === "Modern Hits") {
+            return archiveSeries.filter((series) => series.year >= 2018);
+        }
+
+        if (activeArchiveFilter === "Underrated") {
+            return archiveSeries.filter((series) => {
+                const genre = series.genre.toLowerCase();
+                return (
+                    genre.includes("mystery") ||
+                    genre.includes("crime") ||
+                    genre.includes("historical") ||
+                    genre.includes("thriller")
+                );
+            });
+        }
+
+        return archiveSeries.filter((series) => {
+            const genre = series.genre.toLowerCase();
+            return (
+                genre.includes("action") ||
+                genre.includes("adventure") ||
+                series.studio.toLowerCase().includes("wit") ||
+                series.studio.toLowerCase().includes("toei")
+            );
+        });
+    }, [activeArchiveFilter]);
+
+    const rotatedArchiveSeries = useMemo(() => {
+        if (filteredArchiveSeries.length <= 1) {
+            return filteredArchiveSeries;
+        }
+
+        const normalizedIndex = archiveRotationIndex % filteredArchiveSeries.length;
+        return [
+            ...filteredArchiveSeries.slice(normalizedIndex),
+            ...filteredArchiveSeries.slice(0, normalizedIndex)
+        ];
+    }, [archiveRotationIndex, filteredArchiveSeries]);
+
+    useEffect(() => {
+        setArchiveRotationIndex(0);
+    }, [activeArchiveFilter]);
+
+    useEffect(() => {
+        if (filteredArchiveSeries.length <= 1) {
+            return undefined;
+        }
+
+        const timer = window.setInterval(() => {
+            setArchiveRotationIndex((prev) => (prev + 1) % filteredArchiveSeries.length);
+        }, 7000);
+
+        return () => {
+            window.clearInterval(timer);
+        };
+    }, [filteredArchiveSeries.length]);
+
+    const featuredArchiveSeries = rotatedArchiveSeries[0] || null;
+    const compactArchiveSeries = rotatedArchiveSeries.slice(1);
 
     useEffect(() => {
         const seriesCards = Array.from(document.querySelectorAll(".series-card"));
@@ -233,31 +306,79 @@ const InfluentialSeries = () => {
                 <div className="archive-shell reveal">
                     <div className="archive-heading">
                         <h2 className="reveal">Archive Highlights</h2>
-                        <Link to="/all-influential-series">See All</Link>
+                        <div className="archive-filters" role="tablist" aria-label="Archive category filters">
+                            {archiveFilters.map((filterName) => {
+                                const isActive = activeArchiveFilter === filterName;
+                                return (
+                                    <button
+                                        key={filterName}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        className={`archive-filter-chip ${isActive ? "is-active" : ""}`.trim()}
+                                        onClick={() => setActiveArchiveFilter(filterName)}
+                                    >
+                                        {filterName}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <Link className="archive-see-all" to="/all-influential-series">
+                            See All
+                        </Link>
                     </div>
                     <div className="series-grid">
-                        {archiveSeries.map((series) => (
-                            <SeriesListCard
-                                key={series.id}
-                                series={{
-                                    ...series,
-                                    image: `${process.env.PUBLIC_URL}/${series.image}`
-                                }}
-                                variant="archive"
-                                interactive={{
-                                    tabIndex: 0,
-                                    role: "link",
-                                    ariaLabel: `Open ${series.title || "series"} in archive`,
-                                    onClick: () => navigate("/all-influential-series"),
-                                    onKeyDown: (event) => {
-                                        if (event.key === "Enter" || event.key === " ") {
-                                            event.preventDefault();
-                                            navigate("/all-influential-series");
+                        {featuredArchiveSeries && (
+                            <div className="series-grid__featured">
+                                <SeriesListCard
+                                    key={`${featuredArchiveSeries.id}-${archiveRotationIndex}`}
+                                    series={{
+                                        ...featuredArchiveSeries,
+                                        image: `${process.env.PUBLIC_URL}/${featuredArchiveSeries.image}`
+                                    }}
+                                    variant="archive"
+                                    featured
+                                    animated
+                                    interactive={{
+                                        tabIndex: 0,
+                                        role: "link",
+                                        ariaLabel: `Open ${featuredArchiveSeries.title || "series"} in archive`,
+                                        onClick: () => navigate(`/all-influential-series#${featuredArchiveSeries.id}`),
+                                        onKeyDown: (event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault();
+                                                navigate(`/all-influential-series#${featuredArchiveSeries.id}`);
+                                            }
                                         }
-                                    }
-                                }}
-                            />
-                        ))}
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        <div className="series-grid__compact">
+                            {compactArchiveSeries.map((series) => (
+                                <SeriesListCard
+                                    key={series.id}
+                                    series={{
+                                        ...series,
+                                        image: `${process.env.PUBLIC_URL}/${series.image}`
+                                    }}
+                                    variant="archive"
+                                    interactive={{
+                                        tabIndex: 0,
+                                        role: "link",
+                                        ariaLabel: `Open ${series.title || "series"} in archive`,
+                                        onClick: () => navigate(`/all-influential-series#${series.id}`),
+                                        onKeyDown: (event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault();
+                                                navigate(`/all-influential-series#${series.id}`);
+                                            }
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     {trimmedSearchTerm.length > 0 && !hasVisibleCards && (

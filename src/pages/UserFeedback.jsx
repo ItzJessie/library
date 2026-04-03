@@ -1,3 +1,4 @@
+import { useState } from "react";
 import FeedbackSummaryCard from "../components/FeedbackSummaryCard";
 
 const feedbackItems = [
@@ -28,6 +29,31 @@ const feedbackItems = [
 ];
 
 const UserFeedback = () => {
+    const [status, setStatus] = useState({ type: "", message: "" });
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const formElement = event.currentTarget;
+        const formData = new FormData(formElement);
+        const name = String(formData.get("name") || "").trim();
+
+        if (!name) {
+            setStatus({
+                type: "error",
+                message: "Please enter your name before submitting feedback."
+            });
+            return;
+        }
+
+        setStatus({
+            type: "success",
+            message: "Thanks for sharing your feedback."
+        });
+
+        formElement.reset();
+    };
+
     return (
         <main className="feedback-page">
             <section className="feedback-hero">
@@ -35,7 +61,7 @@ const UserFeedback = () => {
             </section>
 
             <section className="feedback-layout">
-                <form className="feedback-card is-visible" action="#" method="post">
+                <form className="feedback-card is-visible" onSubmit={handleSubmit} noValidate>
                     <h2>Feedback Form</h2>
                     <div className="feedback-grid">
                         <label className="field" htmlFor="feedback-name">
@@ -111,6 +137,11 @@ const UserFeedback = () => {
                     <button className="feedback-submit" type="submit">
                         Submit Feedback
                     </button>
+                    {status.message ? (
+                        <div className={`form-feedback ${status.type}`.trim()} role="status" aria-live="polite">
+                            <p>{status.message}</p>
+                        </div>
+                    ) : null}
                 </form>
 
                 <section className="feedback-card feedback-summary is-visible">
