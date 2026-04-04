@@ -139,6 +139,11 @@ const buildSeriesPreview = (detail) => {
     return `${preview.slice(0, 217).trimEnd()}...`;
 };
 
+const getDefaultApiBaseUrl = () =>
+    process.env.NODE_ENV === "production"
+        ? "https://demo-backend.onrender.com"
+        : "http://localhost:3001";
+
 const DecadePage = () => {
     const navigate = useNavigate();
     const { decade } = useParams();
@@ -164,7 +169,7 @@ const DecadePage = () => {
     };
 
     const apiBase = useMemo(
-        () => (process.env.REACT_APP_API_URL || "http://localhost:3001").replace(/\/+$/, ""),
+        () => (process.env.REACT_APP_API_URL || getDefaultApiBaseUrl()).replace(/\/+$/, ""),
         []
     );
 

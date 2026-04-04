@@ -225,6 +225,11 @@ const getGenreTone = (genre) => {
     return colorEntry ? colorEntry[1] : (normalizedGenre.length * 17) % 360;
 };
 
+const getDefaultApiBaseUrl = () =>
+    process.env.NODE_ENV === "production"
+        ? "https://demo-backend.onrender.com"
+        : "http://localhost:3001";
+
 const getInfluenceScore = (series) => {
     const eraWeight = {
         "1980s": 16,
@@ -399,7 +404,9 @@ const AllInfluentialSeries = () => {
     const timelineButtonRefs = useRef({});
     const timelineTransitionTimersRef = useRef([]);
     const location = useLocation();
-    const animeApiBaseUrl = process.env.REACT_APP_ANIME_API_BASE_URL || "http://localhost:3001";
+    const animeApiBaseUrl = (
+        process.env.REACT_APP_ANIME_API_BASE_URL || getDefaultApiBaseUrl()
+    ).replace(/\/$/, "");
 
     // Mobile UX improvements
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -412,7 +419,7 @@ const AllInfluentialSeries = () => {
         const loadAnimeFromApi = async () => {
             try {
                 setIsAnimeLoading(true);
-                const response = await fetch(`${animeApiBaseUrl.replace(/\/$/, "")}/api/anime`, {
+                const response = await fetch(`${animeApiBaseUrl}/api/anime`, {
                     signal: abortController.signal
                 });
 

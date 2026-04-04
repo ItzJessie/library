@@ -4,7 +4,14 @@ import "../css/StudiosCreatorsPage.css";
 import ProfileCard from "../components/ProfileCard";
 import { useEraInteractions } from "../hooks/useEraInteractions";
 
-const API_BASE_URL = (process.env.REACT_APP_STUDIOS_CREATORS_API_URL || "http://localhost:3001").replace(/\/$/, "");
+const getDefaultApiBaseUrl = () =>
+    process.env.NODE_ENV === "production"
+        ? "https://demo-backend.onrender.com"
+        : "http://localhost:3001";
+
+const API_BASE_URL = (
+    process.env.REACT_APP_STUDIOS_CREATORS_API_URL || getDefaultApiBaseUrl()
+).replace(/\/$/, "");
 const MOBILE_BREAKPOINT = 860;
 const MOBILE_BATCH_SIZE = 6;
 const DESKTOP_COLLAPSE_COUNT = 10;
