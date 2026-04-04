@@ -144,6 +144,8 @@ const getDefaultApiBaseUrl = () =>
         ? "https://demo-backend.onrender.com"
         : "http://localhost:3001";
 
+const ANIME_API_PATH = "/get";
+
 const DecadePage = () => {
     const navigate = useNavigate();
     const { decade } = useParams();
@@ -227,7 +229,7 @@ const DecadePage = () => {
 
         const syncAnimeImages = async () => {
             try {
-                const response = await fetch(`${apiBase}/api/anime`);
+                const response = await fetch(`${apiBase}${ANIME_API_PATH}`);
                 if (!response.ok) {
                     throw new Error(`API returned ${response.status}`);
                 }
@@ -274,7 +276,7 @@ const DecadePage = () => {
         setApiError("");
 
         try {
-            const response = await fetch(`${apiBase}/api/anime`);
+            const response = await fetch(`${apiBase}${ANIME_API_PATH}`);
             if (!response.ok) {
                 throw new Error(`API returned ${response.status}`);
             }

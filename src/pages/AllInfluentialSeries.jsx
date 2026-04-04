@@ -230,6 +230,8 @@ const getDefaultApiBaseUrl = () =>
         ? "https://demo-backend.onrender.com"
         : "http://localhost:3001";
 
+const ANIME_API_PATH = "/get";
+
 const getInfluenceScore = (series) => {
     const eraWeight = {
         "1980s": 16,
@@ -419,7 +421,7 @@ const AllInfluentialSeries = () => {
         const loadAnimeFromApi = async () => {
             try {
                 setIsAnimeLoading(true);
-                const response = await fetch(`${animeApiBaseUrl}/api/anime`, {
+                const response = await fetch(`${animeApiBaseUrl}${ANIME_API_PATH}`, {
                     signal: abortController.signal
                 });
 
