@@ -77,6 +77,36 @@ const normalizeStudiosCreatorsData = (payload) => {
     return { studios, creators };
 };
 
+const resolveBackendImageUrl = (imagePath, baseUrl) => {
+    if (!imagePath) {
+        return "";
+    }
+
+    const normalizedImagePath = String(imagePath).trim();
+    if (!normalizedImagePath) {
+        return "";
+    }
+
+    if (/^https?:\/\//i.test(normalizedImagePath)) {
+        return normalizedImagePath;
+    }
+
+    const normalizedBaseUrl = String(baseUrl || "").replace(/\/$/, "");
+    const normalizedRelativePath = normalizedImagePath.replace(/^\/+/, "");
+    return `${normalizedBaseUrl}/${normalizedRelativePath}`;
+};
+
+const withResolvedImages = (data, baseUrl) => ({
+    studios: (data.studios || []).map((studio) => ({
+        ...studio,
+        image: resolveBackendImageUrl(studio.image, baseUrl)
+    })),
+    creators: (data.creators || []).map((creator) => ({
+        ...creator,
+        image: resolveBackendImageUrl(creator.image, baseUrl)
+    }))
+});
+
 const extractEra = (meta = "") => {
     const match = meta.match(/Era:\s*([^;]+)/i);
     return match ? match[1].trim() : null;
@@ -226,10 +256,11 @@ const StudiosCreators = () => {
                 }
 
                 const payload = await response.json();
-                setStudiosCreators(normalizeStudiosCreatorsData(payload));
+                const normalizedData = normalizeStudiosCreatorsData(payload);
+                setStudiosCreators(withResolvedImages(normalizedData, API_BASE_URL));
             } catch (error) {
                 if (error.name !== "AbortError") {
-                    setStudiosCreators(fallbackStudiosCreatorsData);
+                    setStudiosCreators(withResolvedImages(fallbackStudiosCreatorsData, API_BASE_URL));
                 }
             }
         };
@@ -362,7 +393,7 @@ const StudiosCreators = () => {
             setIsLoadingConnectedAnime(true);
             try {
                 const response = await fetch(
-                    `/api/connected-anime?name=${encodeURIComponent(profile.name)}&type=${type}`,
+                    `${API_BASE_URL}/api/connected-anime?name=${encodeURIComponent(profile.name)}&type=${type}`,
                     { signal: controller.signal }
                 );
 

@@ -401,6 +401,11 @@ const AllInfluentialSeries = () => {
     const location = useLocation();
     const animeApiBaseUrl = process.env.REACT_APP_ANIME_API_BASE_URL || "http://localhost:3001";
 
+    // Mobile UX improvements
+    const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+    const [cardsToShow, setCardsToShow] = useState(12);
+    const CARDS_PER_PAGE = 12;
+
     useEffect(() => {
         const abortController = new AbortController();
 
@@ -641,6 +646,7 @@ const AllInfluentialSeries = () => {
 
             clearTimelineTimers();
             setTimelinePhase("fading-out");
+            setIsFilterDrawerOpen(false); // Close drawer on mobile when era selected
 
             timelineTransitionTimersRef.current.push(
                 window.setTimeout(() => {
@@ -829,6 +835,11 @@ const AllInfluentialSeries = () => {
         };
     }, [location.hash]);
 
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCardsToShow(CARDS_PER_PAGE);
+    }, [selectedGenre, selectedStudio, selectedYear, selectedTimelineEra, selectedEpisodeBand, sortBy, trimmedSearchTerm]);
+
     const navigateToAnime = (anime) => {
         setIsSearchFocused(false);
         setSelectedSuggestionIndex(-1);
@@ -865,6 +876,37 @@ const AllInfluentialSeries = () => {
         setSelectedEpisodeBand("all");
         setSortBy("influential");
         setSelectedSuggestionIndex(-1);
+        setIsFilterDrawerOpen(false);
+    };
+
+    const handleLoadMore = () => {
+        setCardsToShow((prev) => prev + CARDS_PER_PAGE);
+    };
+
+    const visibleSeries = filteredSeries.slice(0, cardsToShow);
+    const hasMoreCards = cardsToShow < filteredSeries.length;
+
+    const getContextLabel = () => {
+        const activeLabelParts = [];
+        
+        if (selectedTimelineEra !== "all") {
+            activeLabelParts.push(selectedTimelineEra);
+        }
+        if (selectedGenre !== "all") {
+            activeLabelParts.push(selectedGenre);
+        }
+        if (selectedStudio !== "all") {
+            activeLabelParts.push(selectedStudio);
+        }
+        if (selectedEpisodeBand !== "all") {
+            activeLabelParts.push(selectedEpisodeBand);
+        }
+
+        if (activeLabelParts.length === 0) {
+            return "All Influential Series";
+        }
+
+        return `Filtered: ${activeLabelParts.join(" + ")}`;
     };
 
     const handleKeyNavigation = (event) => {
@@ -988,16 +1030,22 @@ const AllInfluentialSeries = () => {
                             Narrow the catalog by genre, studio, year, episode count, or sort by influence.
                         </p>
                     </div>
-                    <button type="button" className="all-series-clear-filters" onClick={clearFilters}>
-                        Reset filters
-                    </button>
+                    <div className="all-series-controls__actions">
+                        <button type="button" className="all-series-filter-toggle" onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)} aria-label="Toggle filters and sort options">
+                            ⚙ Filter
+                        </button>
+                        <button type="button" className="all-series-clear-filters" onClick={clearFilters}>
+                            Reset
+                        </button>
+                    </div>
                 </div>
 
-                <div className="all-series-timeline" aria-label="Timeline decade filter">
-                    <div className="all-series-timeline__header">
-                        <h3>Timeline</h3>
-                        <p>Choose a decade to show only series released in that time window.</p>
-                    </div>
+                <div className={`all-series-filters-wrapper ${isFilterDrawerOpen ? 'is-open' : ''}`}>
+                    <div className="all-series-timeline" aria-label="Timeline decade filter">
+                        <div className="all-series-timeline__header">
+                            <h3>Timeline</h3>
+                            <p>Choose a decade to show only series released in that time window.</p>
+                        </div>
 
                     <div
                         className={`all-series-timeline__rail ${
@@ -1138,9 +1186,29 @@ const AllInfluentialSeries = () => {
                     )}
                     {animeSourceMessage && <span>{animeSourceMessage}</span>}
                 </div>
+                </div>
             </section>
 
             <section className="all-series-shell">
+                <div className="all-series-sticky-header">
+                    <p className="all-series-context-label">{getContextLabel()}</p>
+                    <div className="all-series-quick-jump" aria-label="Jump to era">
+                        {timelineEras.map((era) => (
+                            <button
+                                key={`jump-${era}`}
+                                type="button"
+                                className={`all-series-quick-jump__button ${selectedTimelineEra === era ? 'is-active' : ''}`}
+                                onClick={() => handleTimelineSelect(era)}
+                                aria-label={`Jump to ${era}`}
+                            >
+                                {era.replace("s", "").slice(0, 3)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="all-series-progress-indicator" style={{ width: `${(cardsToShow / Math.max(visibleCount, 1)) * 100}%` }} />
+
                 <div
                     className={`all-series-grid ${
                         timelinePhase === "fading-out"
@@ -1151,7 +1219,7 @@ const AllInfluentialSeries = () => {
                     }`.trim()}
                     aria-live="polite"
                 >
-                    {filteredSeries.map((series) => (
+                    {visibleSeries.map((series) => (
                         <button
                             key={series.id}
                             id={series.id}
@@ -1161,7 +1229,7 @@ const AllInfluentialSeries = () => {
                             aria-label={`Open details for ${series.title}`}
                         >
                             <div className="all-series-card__media">
-                                <img src={series.image} alt={series.title} />
+                                <img src={series.image} alt={series.title} loading="lazy" decoding="async" />
                                 <div className="all-series-card__media-overlay">
                                     <span className={`all-series-badge all-series-badge--${series.badge.tone}`}>
                                         <span className="all-series-badge__icon">{series.badge.icon}</span>
@@ -1218,7 +1286,32 @@ const AllInfluentialSeries = () => {
                         </div>
                     )}
                 </div>
+
+                {hasMoreCards && visibleCount > 0 && (
+                    <div className="all-series-load-more-wrapper">
+                        <button
+                            type="button"
+                            className="all-series-load-more"
+                            onClick={handleLoadMore}
+                            aria-label="Load more anime series"
+                        >
+                            Load More
+                        </button>
+                        <p className="all-series-load-more-text">
+                            Showing {cardsToShow} of {visibleCount}
+                        </p>
+                    </div>
+                )}
             </section>
+
+            {isFilterDrawerOpen && (
+                <div
+                    className="all-series-filter-drawer-backdrop"
+                    onClick={() => setIsFilterDrawerOpen(false)}
+                    role="presentation"
+                    aria-hidden="true"
+                />
+            )}
 
             {selectedSeries && (
                 <div
@@ -1243,7 +1336,7 @@ const AllInfluentialSeries = () => {
                         </button>
 
                         <div className="all-series-modal__media">
-                            <img src={selectedSeries.image} alt={selectedSeries.title} />
+                            <img src={selectedSeries.image} alt={selectedSeries.title} loading="lazy" decoding="async" />
                             <div className={`all-series-badge all-series-badge--${selectedSeries.badge.tone}`}>
                                 <span className="all-series-badge__icon">{selectedSeries.badge.icon}</span>
                                 <span className="all-series-badge__text">{selectedSeries.badge.label}</span>

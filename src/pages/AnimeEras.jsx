@@ -9,6 +9,7 @@ import { useEraInteractions } from "../hooks/useEraInteractions";
 const AnimeEras = () => {
     const [activeEra, setActiveEra] = useState(null);
     const { openOverlay, closeOverlay } = useEraInteractions();
+    const orderedEraIds = eraPanels.map((era) => era.id);
     const eraGalleryCards = [
         {
             title: "1980s Innovation",
@@ -74,6 +75,13 @@ const AnimeEras = () => {
         setActiveEra(null);
     };
 
+    const handleNavigateEra = (targetEraId) => {
+        if (!targetEraId) {
+            return;
+        }
+        setActiveEra(targetEraId);
+    };
+
     return (
         <>
             <main className="page-eras">
@@ -114,7 +122,11 @@ const AnimeEras = () => {
                         <h2>Years Covered</h2>
                         <ul>
                             {eraPanels.map((era) => (
-                                <li key={era.id} data-era={era.id}>
+                                <li
+                                    key={era.id}
+                                    data-era={era.id}
+                                    className={activeEra === era.id ? "is-active" : ""}
+                                >
                                     <button
                                         className="era-trigger"
                                         type="button"
@@ -154,6 +166,8 @@ const AnimeEras = () => {
                                 <img
                                     src={`${process.env.PUBLIC_URL}/images/${card.image}`}
                                     alt={card.alt}
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 <div className="gallery-content">
                                     <h3>{card.title}</h3>
@@ -166,14 +180,25 @@ const AnimeEras = () => {
             </section>
 
             {/* Era Overlay Modals */}
-            {eraPanels.map((era) => (
-                <EraOverlay
-                    key={`overlay-${era.id}`}
-                    era={era}
-                    isOpen={activeEra === era.id}
-                    onClose={handleCloseOverlay}
-                />
-            ))}
+            {eraPanels.map((era, index) => {
+                const prevEraId = index > 0 ? orderedEraIds[index - 1] : null;
+                const nextEraId =
+                    index < orderedEraIds.length - 1
+                        ? orderedEraIds[index + 1]
+                        : null;
+
+                return (
+                    <EraOverlay
+                        key={`overlay-${era.id}`}
+                        era={era}
+                        isOpen={activeEra === era.id}
+                        onClose={handleCloseOverlay}
+                        onNavigateEra={handleNavigateEra}
+                        prevEraId={prevEraId}
+                        nextEraId={nextEraId}
+                    />
+                );
+            })}
         </>
     );
 };
