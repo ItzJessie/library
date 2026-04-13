@@ -1,5 +1,5 @@
 import "../css/Home.css";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import HomeFeatureCard from "../components/HomeFeatureCard";
 import HomeArchiveCard from "../components/HomeArchiveCard";
 import ContactForm from "../components/ContactForm";
@@ -66,6 +66,14 @@ const archiveCards = [
 
 const Home = () => {
     useEraInteractions();
+    const outletContext = useOutletContext();
+    const searchPreview = outletContext?.searchPreview;
+    const hasLiveSearchPreview = Boolean(
+        searchPreview?.isOpen &&
+            searchPreview?.query?.trim() &&
+            Array.isArray(searchPreview?.results) &&
+            searchPreview.results.length > 0
+    );
 
     return (
         <main className="page-home">
@@ -79,6 +87,33 @@ const Home = () => {
                     </p>
                 </div>
             </section>
+
+            {hasLiveSearchPreview && (
+                <section className="home-search-preview reveal reveal-up" aria-label="Live search results">
+                    <div className="home-search-preview-header">
+                        <h2>Live Search Preview</h2>
+                        <p>
+                            Showing matches for <strong>{searchPreview.query}</strong>
+                        </p>
+                    </div>
+                    <div className="home-search-preview-grid">
+                        {searchPreview.results.slice(0, 6).map((entry) => (
+                            <article className="home-search-result-card" key={entry.id}>
+                                <p className="home-search-result-type">{entry.type}</p>
+                                <h3>{entry.title}</h3>
+                                <p>{entry.subtitle}</p>
+                                <div className="home-search-result-meta">
+                                    {entry.era && <span>{entry.era}</span>}
+                                    {entry.mood && <span>{entry.mood}</span>}
+                                </div>
+                                <Link className="home-search-result-link" to={entry.route}>
+                                    Open
+                                </Link>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <section className="content-grid">
                 <div className="featured reveal reveal-left">

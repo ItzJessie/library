@@ -225,12 +225,155 @@ const getGenreTone = (genre) => {
     return colorEntry ? colorEntry[1] : (normalizedGenre.length * 17) % 360;
 };
 
+const DEMO_ANIME_API_BASE_URL = "https://demo-backend.onrender.com";
+
 const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
-        ? "https://demo-backend.onrender.com"
+        ? DEMO_ANIME_API_BASE_URL
         : "http://localhost:3001";
 
+const isLocalhostUrl = (value) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(String(value || "").trim());
+
+const isLocalhostRuntime = () => {
+    if (typeof window === "undefined") {
+        return false;
+    }
+
+    return /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+};
+
+const resolveAnimeApiBaseUrl = () => {
+    const explicitBaseUrl =
+        process.env.REACT_APP_ANIME_API_BASE_URL ||
+        process.env.REACT_APP_API_URL ||
+        "";
+
+    if (
+        process.env.NODE_ENV === "production" &&
+        isLocalhostUrl(explicitBaseUrl) &&
+        !isLocalhostRuntime()
+    ) {
+        return getDefaultApiBaseUrl();
+    }
+
+    return (explicitBaseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, "");
+};
+
+const resolveAnimeApiBaseUrls = () => {
+    const preferredBaseUrl = resolveAnimeApiBaseUrl();
+    const candidates = [preferredBaseUrl];
+    const hasExplicitBaseUrl = Boolean(
+        process.env.REACT_APP_ANIME_API_BASE_URL || process.env.REACT_APP_API_URL
+    );
+
+    if (!hasExplicitBaseUrl && preferredBaseUrl !== DEMO_ANIME_API_BASE_URL) {
+        candidates.push(DEMO_ANIME_API_BASE_URL);
+    }
+
+    return candidates;
+};
+
 const ANIME_API_PATH = "/get";
+const ANIME_CREATE_API_PATH_CANDIDATES = ["/add", "/create", "/new"];
+
+const toUploadImagePath = (fileName) => {
+    const normalizedName = String(fileName || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9._-]/g, "");
+
+    return `images/uploads/${normalizedName || "poster-image.jpg"}`;
+};
+
+const createAnimeFieldRules = {
+    title: { min: 2, max: 120 },
+    year: { min: 1960, max: new Date().getFullYear() + 1 },
+    studio: { min: 2, max: 90 },
+    genre: { min: 2, max: 80 },
+    episodes: { min: 1, max: 2500 },
+    synopsis: { min: 20, max: 1200 },
+    img_name: { min: 6, max: 512 }
+};
+
+const validateAnimeCreatePayload = (payload) => {
+    const errors = {};
+
+    const title = String(payload.title || "").trim();
+    if (!title) {
+        errors.title = "Title is required.";
+    } else if (title.length < createAnimeFieldRules.title.min) {
+        errors.title = `Title must be at least ${createAnimeFieldRules.title.min} characters.`;
+    } else if (title.length > createAnimeFieldRules.title.max) {
+        errors.title = `Title must be less than ${createAnimeFieldRules.title.max + 1} characters.`;
+    }
+
+    const yearValue = Number(payload.year);
+    if (!Number.isInteger(yearValue)) {
+        errors.year = "Year must be a whole number.";
+    } else if (yearValue < createAnimeFieldRules.year.min || yearValue > createAnimeFieldRules.year.max) {
+        errors.year = `Year must be between ${createAnimeFieldRules.year.min} and ${createAnimeFieldRules.year.max}.`;
+    }
+
+    const studio = String(payload.studio || "").trim();
+    if (!studio) {
+        errors.studio = "Studio is required.";
+    } else if (studio.length < createAnimeFieldRules.studio.min || studio.length > createAnimeFieldRules.studio.max) {
+        errors.studio = `Studio must be ${createAnimeFieldRules.studio.min}-${createAnimeFieldRules.studio.max} characters.`;
+    }
+
+    const genre = String(payload.genre || "").trim();
+    if (!genre) {
+        errors.genre = "Genre is required.";
+    } else if (genre.length < createAnimeFieldRules.genre.min || genre.length > createAnimeFieldRules.genre.max) {
+        errors.genre = `Genre must be ${createAnimeFieldRules.genre.min}-${createAnimeFieldRules.genre.max} characters.`;
+    }
+
+    const episodesValue = Number(payload.episodes);
+    if (!Number.isInteger(episodesValue)) {
+        errors.episodes = "Episodes must be a whole number.";
+    } else if (
+        episodesValue < createAnimeFieldRules.episodes.min ||
+        episodesValue > createAnimeFieldRules.episodes.max
+    ) {
+        errors.episodes = `Episodes must be between ${createAnimeFieldRules.episodes.min} and ${createAnimeFieldRules.episodes.max}.`;
+    }
+
+    const synopsis = String(payload.synopsis || "").trim();
+    if (!synopsis) {
+        errors.synopsis = "Synopsis is required.";
+    } else if (synopsis.length < createAnimeFieldRules.synopsis.min || synopsis.length > createAnimeFieldRules.synopsis.max) {
+        errors.synopsis = `Synopsis must be ${createAnimeFieldRules.synopsis.min}-${createAnimeFieldRules.synopsis.max} characters.`;
+    }
+
+    const imagePath = String(payload.img_name || "").trim();
+    const hasValidImageFormat = /^(https?:\/\/[^\s]+|images\/[A-Za-z0-9_./-]+)$/i.test(imagePath);
+    if (!imagePath) {
+        errors.img_name = "Poster image path is required.";
+    } else if (imagePath.length < createAnimeFieldRules.img_name.min || imagePath.length > createAnimeFieldRules.img_name.max) {
+        errors.img_name = `Poster image path must be ${createAnimeFieldRules.img_name.min}-${createAnimeFieldRules.img_name.max} characters.`;
+    } else if (!hasValidImageFormat) {
+        errors.img_name = "Use a full URL or a relative path like images/your-poster.webp.";
+    }
+
+    return errors;
+};
+
+const normalizeCreatedAnimeRecord = (record, fallbackPayload) => {
+    const source = record && typeof record === "object" ? record : {};
+
+    return {
+        title: source.title || fallbackPayload.title,
+        img_name: source.img_name || source.image || fallbackPayload.img_name,
+        year: Number(source.year || fallbackPayload.year),
+        era: source.era || fallbackPayload.era,
+        studio: source.studio || fallbackPayload.studio,
+        genre: source.genre || fallbackPayload.genre,
+        episodes: Number(source.episodes || fallbackPayload.episodes),
+        synopsis: source.synopsis || fallbackPayload.synopsis
+    };
+};
 
 const getInfluenceScore = (series) => {
     const eraWeight = {
@@ -401,14 +544,27 @@ const AllInfluentialSeries = () => {
     const [isAnimeLoading, setIsAnimeLoading] = useState(true);
     const [animeSource, setAnimeSource] = useState("local");
     const [animeSourceMessage, setAnimeSourceMessage] = useState("");
+    const [newAnimeForm, setNewAnimeForm] = useState({
+        title: "",
+        year: "",
+        studio: "",
+        genre: "",
+        episodes: "",
+        synopsis: "",
+        img_name: ""
+    });
+    const [newAnimeErrors, setNewAnimeErrors] = useState({});
+    const [newAnimeImagePreviewUrl, setNewAnimeImagePreviewUrl] = useState("");
+    const [newAnimeImageLabel, setNewAnimeImageLabel] = useState("");
+    const [isSubmittingAnime, setIsSubmittingAnime] = useState(false);
+    const [createAnimeStatus, setCreateAnimeStatus] = useState({ type: "idle", message: "" });
     const searchFormRef = useRef(null);
     const timelineRailRef = useRef(null);
     const timelineButtonRefs = useRef({});
     const timelineTransitionTimersRef = useRef([]);
     const location = useLocation();
-    const animeApiBaseUrl = (
-        process.env.REACT_APP_ANIME_API_BASE_URL || getDefaultApiBaseUrl()
-    ).replace(/\/$/, "");
+    const animeApiBaseUrls = useMemo(() => resolveAnimeApiBaseUrls(), []);
+    const [animeApiBaseUrl, setAnimeApiBaseUrl] = useState(animeApiBaseUrls[0]);
 
     // Mobile UX improvements
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -421,32 +577,51 @@ const AllInfluentialSeries = () => {
         const loadAnimeFromApi = async () => {
             try {
                 setIsAnimeLoading(true);
-                const response = await fetch(`${animeApiBaseUrl}${ANIME_API_PATH}`, {
-                    signal: abortController.signal
-                });
+                let lastError = null;
 
-                if (!response.ok) {
-                    throw new Error(`API responded with status ${response.status}`);
+                for (const baseUrl of animeApiBaseUrls) {
+                    try {
+                        const response = await fetch(`${baseUrl}${ANIME_API_PATH}`, {
+                            signal: abortController.signal
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`API responded with status ${response.status}`);
+                        }
+
+                        const payload = await response.json();
+                        if (!Array.isArray(payload)) {
+                            throw new Error("API payload for anime list is not an array");
+                        }
+
+                        setAnimeApiBaseUrl(baseUrl);
+                        setRemoteAnimeSeries(payload);
+                        setAnimeSource("api");
+                        setAnimeSourceMessage(`Loaded ${payload.length} titles from backend API.`);
+                        return;
+                    } catch (error) {
+                        if (error.name === "AbortError") {
+                            throw error;
+                        }
+
+                        lastError = error;
+                    }
                 }
 
-                const payload = await response.json();
-                if (!Array.isArray(payload)) {
-                    throw new Error("API payload for anime list is not an array");
-                }
-
-                setRemoteAnimeSeries(payload);
-                setAnimeSource("api");
-                setAnimeSourceMessage(`Loaded ${payload.length} titles from backend API.`);
+                throw lastError || new Error("No backend API candidates responded");
             } catch (error) {
                 if (error.name === "AbortError") {
                     return;
                 }
 
-                console.warn("Falling back to local anime data", error);
+                console.warn(
+                    `Falling back to local anime data after trying ${animeApiBaseUrls.join(" and ")}`,
+                    error
+                );
                 setRemoteAnimeSeries([]);
                 setAnimeSource("local");
                 setAnimeSourceMessage(
-                    "Using local archive fallback because backend API could not be reached."
+                    `Using local archive fallback because backend API could not be reached at ${animeApiBaseUrls.join(" or ")}.`
                 );
             } finally {
                 setIsAnimeLoading(false);
@@ -458,7 +633,7 @@ const AllInfluentialSeries = () => {
         return () => {
             abortController.abort();
         };
-    }, [animeApiBaseUrl]);
+    }, [animeApiBaseUrls]);
 
     const animeDataset = useMemo(() => {
         if (animeSource === "api") {
@@ -467,6 +642,216 @@ const AllInfluentialSeries = () => {
 
         return animeSeries;
     }, [animeSource, remoteAnimeSeries]);
+
+    const handleNewAnimeFieldChange = useCallback((event) => {
+        const { name, value } = event.target;
+
+        setNewAnimeForm((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+
+        setNewAnimeErrors((previous) => {
+            if (!previous[name]) {
+                return previous;
+            }
+
+            const nextErrors = { ...previous };
+            delete nextErrors[name];
+            return nextErrors;
+        });
+
+        if (createAnimeStatus.type !== "idle") {
+            setCreateAnimeStatus({ type: "idle", message: "" });
+        }
+    }, [createAnimeStatus.type]);
+
+    const handleNewAnimeImageChange = useCallback((event) => {
+        const selectedFile = event.target.files?.[0] || null;
+
+        setNewAnimeErrors((previous) => {
+            if (!previous.img_name) {
+                return previous;
+            }
+
+            const nextErrors = { ...previous };
+            delete nextErrors.img_name;
+            return nextErrors;
+        });
+
+        if (!selectedFile) {
+            setNewAnimeForm((previous) => ({
+                ...previous,
+                img_name: ""
+            }));
+            setNewAnimeImageLabel("");
+            setNewAnimeImagePreviewUrl((previous) => {
+                if (previous) {
+                    URL.revokeObjectURL(previous);
+                }
+                return "";
+            });
+            return;
+        }
+
+        const imagePath = toUploadImagePath(selectedFile.name);
+        const previewUrl = URL.createObjectURL(selectedFile);
+
+        setNewAnimeForm((previous) => ({
+            ...previous,
+            img_name: imagePath
+        }));
+        setNewAnimeImageLabel(selectedFile.name);
+        setNewAnimeImagePreviewUrl((previous) => {
+            if (previous) {
+                URL.revokeObjectURL(previous);
+            }
+            return previewUrl;
+        });
+
+        if (createAnimeStatus.type !== "idle") {
+            setCreateAnimeStatus({ type: "idle", message: "" });
+        }
+    }, [createAnimeStatus.type]);
+
+    useEffect(
+        () => () => {
+            if (newAnimeImagePreviewUrl) {
+                URL.revokeObjectURL(newAnimeImagePreviewUrl);
+            }
+        },
+        [newAnimeImagePreviewUrl]
+    );
+
+    const handleCreateAnimeSubmit = useCallback(
+        async (event) => {
+            event.preventDefault();
+
+            const payload = {
+                title: newAnimeForm.title.trim(),
+                year: Number(newAnimeForm.year),
+                studio: newAnimeForm.studio.trim(),
+                genre: newAnimeForm.genre.trim(),
+                episodes: Number(newAnimeForm.episodes),
+                synopsis: newAnimeForm.synopsis.trim(),
+                img_name: newAnimeForm.img_name.trim(),
+                era: getEraLabel(Number(newAnimeForm.year))
+            };
+
+            const errors = validateAnimeCreatePayload(payload);
+            if (Object.keys(errors).length > 0) {
+                setNewAnimeErrors(errors);
+                setCreateAnimeStatus({
+                    type: "error",
+                    message: "Please fix the highlighted fields before submitting."
+                });
+                return;
+            }
+
+            setNewAnimeErrors({});
+            setIsSubmittingAnime(true);
+            setCreateAnimeStatus({ type: "idle", message: "" });
+
+            try {
+                let lastError = null;
+
+                for (const baseUrl of animeApiBaseUrls) {
+                    for (const path of ANIME_CREATE_API_PATH_CANDIDATES) {
+                        try {
+                            const response = await fetch(`${baseUrl}${path}`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (response.status === 404) {
+                                continue;
+                            }
+
+                            const responseData = await response.json().catch(() => null);
+
+                            if (!response.ok) {
+                                const serverMessage =
+                                    responseData?.message ||
+                                    responseData?.error ||
+                                    `Server rejected the request with status ${response.status}.`;
+                                throw new Error(serverMessage);
+                            }
+
+                            const createdRecord =
+                                responseData?.data || responseData?.anime || responseData?.item || responseData;
+                            const normalizedRecord = normalizeCreatedAnimeRecord(createdRecord, payload);
+
+                            setAnimeApiBaseUrl(baseUrl);
+                            setAnimeSource("api");
+                            setRemoteAnimeSeries((previous) => {
+                                const next =
+                                    Array.isArray(previous) && previous.length > 0
+                                        ? [...previous]
+                                        : animeSource === "local"
+                                            ? [...animeSeries]
+                                            : [];
+                                const duplicateIndex = next.findIndex((entry) => {
+                                    const sameTitle =
+                                        String(entry?.title || entry?.name || "").trim().toLowerCase() ===
+                                        normalizedRecord.title.toLowerCase();
+                                    const sameYear = Number(entry?.year) === Number(normalizedRecord.year);
+                                    return sameTitle && sameYear;
+                                });
+
+                                if (duplicateIndex >= 0) {
+                                    next[duplicateIndex] = {
+                                        ...next[duplicateIndex],
+                                        ...normalizedRecord
+                                    };
+                                    return next;
+                                }
+
+                                return [normalizedRecord, ...next];
+                            });
+
+                            setCreateAnimeStatus({
+                                type: "success",
+                                message: `Saved \"${normalizedRecord.title}\" to the server and updated the archive.`
+                            });
+                            setAnimeSourceMessage("Archive refreshed with your new submission.");
+                            setNewAnimeForm({
+                                title: "",
+                                year: "",
+                                studio: "",
+                                genre: "",
+                                episodes: "",
+                                synopsis: "",
+                                img_name: ""
+                            });
+                            setNewAnimeImageLabel("");
+                            setNewAnimeImagePreviewUrl((previous) => {
+                                if (previous) {
+                                    URL.revokeObjectURL(previous);
+                                }
+                                return "";
+                            });
+                            return;
+                        } catch (error) {
+                            lastError = error;
+                        }
+                    }
+                }
+
+                throw lastError || new Error("Could not locate a working create endpoint on the backend.");
+            } catch (error) {
+                setCreateAnimeStatus({
+                    type: "error",
+                    message: error.message || "Unable to add the anime right now."
+                });
+            } finally {
+                setIsSubmittingAnime(false);
+            }
+        },
+        [animeApiBaseUrls, newAnimeForm]
+    );
 
     const allSeries = useMemo(
         () =>
@@ -1029,6 +1414,171 @@ const AllInfluentialSeries = () => {
                     <h1>All Influential Series</h1>
                     <p>{getHeroSummary(visibleCount, enhancedSeries.length, filtersActive)}</p>
                 </div>
+            </section>
+
+            <section className="all-series-create-panel" aria-labelledby="add-series-heading">
+                <div className="all-series-create-panel__intro">
+                    <h2 id="add-series-heading">Add New Influential Series</h2>
+                    <p>
+                        Share a title with the archive. Client validation mirrors backend Joi-style rules,
+                        then successful submissions are posted to the server and immediately shown in this list.
+                    </p>
+                </div>
+
+                <form className="all-series-create-form" onSubmit={handleCreateAnimeSubmit}>
+                    <label htmlFor="create-anime-title">
+                        <span>Title</span>
+                        <input
+                            id="create-anime-title"
+                            name="title"
+                            type="text"
+                            value={newAnimeForm.title}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="e.g. Mob Psycho 100"
+                            required
+                            minLength="1"
+                            aria-invalid={Boolean(newAnimeErrors.title)}
+                        />
+                        {newAnimeErrors.title && <small>{newAnimeErrors.title}</small>}
+                    </label>
+
+                    <label htmlFor="create-anime-year">
+                        <span>Year</span>
+                        <input
+                            id="create-anime-year"
+                            name="year"
+                            type="number"
+                            required
+                            min="1900"
+                            max="2100"
+                            step="1"
+                            value={newAnimeForm.year}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="2021"
+                            aria-invalid={Boolean(newAnimeErrors.year)}
+                        />
+                        {newAnimeErrors.year && <small>{newAnimeErrors.year}</small>}
+                    </label>
+
+                    <label htmlFor="create-anime-studio">
+                        <span>Studio</span>
+                        <input
+                            id="create-anime-studio"
+                            name="studio"
+                            type="text"
+                            value={newAnimeForm.studio}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="Bones"
+                            required
+                            minLength="1"
+                            aria-invalid={Boolean(newAnimeErrors.studio)}
+                        />
+                        {newAnimeErrors.studio && <small>{newAnimeErrors.studio}</small>}
+                    </label>
+
+                    <label htmlFor="create-anime-genre">
+                        <span>Genre</span>
+                        <input
+                            id="create-anime-genre"
+                            name="genre"
+                            type="text"
+                            value={newAnimeForm.genre}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="Action, Supernatural"
+                            required
+                            minLength="1"
+                            aria-invalid={Boolean(newAnimeErrors.genre)}
+                        />
+                        {newAnimeErrors.genre && <small>{newAnimeErrors.genre}</small>}
+                    </label>
+
+                    <label htmlFor="create-anime-episodes">
+                        <span>Episodes</span>
+                        <input
+                            id="create-anime-episodes"
+                            name="episodes"
+                            type="number"
+                            required
+                            min="1"
+                            step="1"
+                            value={newAnimeForm.episodes}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="24"
+                            aria-invalid={Boolean(newAnimeErrors.episodes)}
+                        />
+                        {newAnimeErrors.episodes && <small>{newAnimeErrors.episodes}</small>}
+                    </label>
+
+                    <div className="all-series-create-form__image-section is-wide">
+                        <div className="all-series-create-form__image-preview">
+                            <div className="preview-container">
+                                {newAnimeImagePreviewUrl ? (
+                                    <img
+                                        key={newAnimeImagePreviewUrl}
+                                        src={newAnimeImagePreviewUrl}
+                                        alt="Poster preview"
+                                    />
+                                ) : null}
+                                <div
+                                    className="preview-placeholder"
+                                    style={newAnimeImagePreviewUrl ? { display: "none" } : {}}
+                                >
+                                    <span>Poster Preview</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <label className="all-series-create-form__image-input" htmlFor="create-anime-img-name">
+                            <span>Choose Poster Image</span>
+                            <input
+                                id="create-anime-img-name"
+                                name="poster_file"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleNewAnimeImageChange}
+                                required
+                                aria-invalid={Boolean(newAnimeErrors.img_name)}
+                            />
+                            <p className="all-series-create-form__image-name">
+                                {newAnimeImageLabel || "No file selected"}
+                            </p>
+                            {newAnimeErrors.img_name && <small>{newAnimeErrors.img_name}</small>}
+                        </label>
+                    </div>
+
+                    <label className="is-wide" htmlFor="create-anime-synopsis">
+                        <span>Synopsis</span>
+                        <textarea
+                            id="create-anime-synopsis"
+                            name="synopsis"
+                            rows="4"
+                            value={newAnimeForm.synopsis}
+                            onChange={handleNewAnimeFieldChange}
+                            placeholder="A quick synopsis of the series and why it stands out."
+                            required
+                            minLength="1"
+                            aria-invalid={Boolean(newAnimeErrors.synopsis)}
+                        ></textarea>
+                        {newAnimeErrors.synopsis && <small>{newAnimeErrors.synopsis}</small>}
+                    </label>
+
+                    <div className="all-series-create-form__actions is-wide">
+                        <button type="submit" disabled={isSubmittingAnime}>
+                            {isSubmittingAnime ? "Saving..." : "Add Series to Archive"}
+                        </button>
+                        <p>Server target: {animeApiBaseUrl}</p>
+                    </div>
+
+                    {createAnimeStatus.type !== "idle" && (
+                        <div
+                            className={`all-series-create-form__status is-${createAnimeStatus.type}`}
+                            role="status"
+                            aria-live="polite"
+                        >
+                            {createAnimeStatus.message}
+                        </div>
+                    )}
+                </form>
             </section>
 
             <section className="all-series-controls" aria-label="Filter and sort influential series">

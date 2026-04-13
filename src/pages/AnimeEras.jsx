@@ -84,7 +84,32 @@ const AnimeEras = () => {
 
     return (
         <>
-            <main className="page-eras">
+            <main className="page-eras decorative-element-container">
+                {/* Japanese Decorative Elements - Cherry Blossoms */}
+                <svg className="decorative-sakura" viewBox="0 0 100 100" width="60" height="60" style={{ top: "10%", left: "5%" }}>
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
+                    <circle cx="30" cy="30" r="8" fill="currentColor"/>
+                    <circle cx="70" cy="30" r="8" fill="currentColor"/>
+                    <circle cx="50" cy="20" r="8" fill="currentColor"/>
+                    <circle cx="30" cy="70" r="8" fill="currentColor"/>
+                    <circle cx="70" cy="70" r="8" fill="currentColor"/>
+                </svg>
+                
+                <svg className="decorative-sakura" viewBox="0 0 100 100" width="50" height="50" style={{ top: "60%", right: "8%", opacity: 0.05 }}>
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
+                    <circle cx="30" cy="30" r="8" fill="currentColor"/>
+                    <circle cx="70" cy="30" r="8" fill="currentColor"/>
+                    <circle cx="50" cy="20" r="8" fill="currentColor"/>
+                    <circle cx="30" cy="70" r="8" fill="currentColor"/>
+                    <circle cx="70" cy="70" r="8" fill="currentColor"/>
+                </svg>
+                
+                {/* Artistic Decorative Lines */}
+                <svg className="decorative-line" viewBox="0 0 200 100" width="200" height="100" style={{ top: "30%", right: "2%" }}>
+                    <path d="M 20 30 Q 80 10, 140 50 T 200 50" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <path d="M 10 70 Q 80 90, 150 60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6"/>
+                </svg>
+
                 <section className="eras-hero">
                     <div className="eras-hero-inner" data-parallax="0.08">
                         <p className="eras-kicker">
@@ -150,7 +175,15 @@ const AnimeEras = () => {
             </main>
 
             {/* Era Gallery Section */}
-            <section className="era-gallery">
+            <section className="era-gallery decorative-element-container">
+                {/* Decorative Line at Gallery Top */}
+                <svg className="decorative-line" viewBox="0 0 300 60" width="300" height="60" style={{ position: "absolute", top: "20px", left: "50%", transform: "translateX(-50%)", opacity: 0.08 }}>
+                    <line x1="10" y1="30" x2="290" y2="30" stroke="currentColor" strokeWidth="1"/>
+                    <circle cx="50" cy="30" r="3" fill="currentColor"/>
+                    <circle cx="150" cy="30" r="3" fill="currentColor"/>
+                    <circle cx="250" cy="30" r="3" fill="currentColor"/>
+                </svg>
+
                 <div className="gallery-inner">
                     <h2>Iconic Anime Moments Through the Ages</h2>
                     <p>Explore landmark series that defined each era</p>

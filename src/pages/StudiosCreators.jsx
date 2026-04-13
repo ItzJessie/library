@@ -9,9 +9,35 @@ const getDefaultApiBaseUrl = () =>
         ? "https://demo-backend.onrender.com"
         : "http://localhost:3001";
 
-const API_BASE_URL = (
-    process.env.REACT_APP_STUDIOS_CREATORS_API_URL || getDefaultApiBaseUrl()
-).replace(/\/$/, "");
+const isLocalhostUrl = (value) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(String(value || "").trim());
+
+const isLocalhostRuntime = () => {
+    if (typeof window === "undefined") {
+        return false;
+    }
+
+    return /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+};
+
+const resolveStudiosCreatorsApiBaseUrl = () => {
+    const explicitBaseUrl =
+        process.env.REACT_APP_STUDIOS_CREATORS_API_URL ||
+        process.env.REACT_APP_API_URL ||
+        "";
+
+    if (
+        process.env.NODE_ENV === "production" &&
+        isLocalhostUrl(explicitBaseUrl) &&
+        !isLocalhostRuntime()
+    ) {
+        return getDefaultApiBaseUrl();
+    }
+
+    return (explicitBaseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, "");
+};
+
+const API_BASE_URL = resolveStudiosCreatorsApiBaseUrl();
 const MOBILE_BREAKPOINT = 860;
 const MOBILE_BATCH_SIZE = 6;
 const DESKTOP_COLLAPSE_COUNT = 10;

@@ -122,6 +122,11 @@ const toAbsoluteImageUrl = (apiBase, path) => {
     return `${apiBase}/${String(path).replace(/^\/+/, "")}`;
 };
 
+const localSeriesImageFallbacks = {
+    "zeta gundam": `${process.env.PUBLIC_URL}/images/zeta-gundam-poster.jpeg`,
+    "princess mononoke": `${process.env.PUBLIC_URL}/images/princess-monoke-poster.png`
+};
+
 const buildSeriesPreview = (detail) => {
     const text = String(detail || "").trim();
 
@@ -143,6 +148,31 @@ const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
         ? "https://demo-backend.onrender.com"
         : "http://localhost:3001";
+
+const isLocalhostUrl = (value) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(String(value || "").trim());
+
+const isLocalhostRuntime = () => {
+    if (typeof window === "undefined") {
+        return false;
+    }
+
+    return /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+};
+
+const resolveApiBaseUrl = () => {
+    const explicitBaseUrl = process.env.REACT_APP_API_URL || "";
+
+    if (
+        process.env.NODE_ENV === "production" &&
+        isLocalhostUrl(explicitBaseUrl) &&
+        !isLocalhostRuntime()
+    ) {
+        return getDefaultApiBaseUrl();
+    }
+
+    return (explicitBaseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, "");
+};
 
 const ANIME_API_PATH = "/get";
 
@@ -170,10 +200,7 @@ const DecadePage = () => {
         setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
     };
 
-    const apiBase = useMemo(
-        () => (process.env.REACT_APP_API_URL || getDefaultApiBaseUrl()).replace(/\/+$/, ""),
-        []
-    );
+    const apiBase = useMemo(() => resolveApiBaseUrl(), []);
 
     const currentEraPosition = eraOrder.indexOf(decade);
     const prevEra = currentEraPosition > 0 ? eraOrder[currentEraPosition - 1] : null;
@@ -267,7 +294,10 @@ const DecadePage = () => {
         return <Navigate to="/" replace />;
     }
 
-    const getSeriesImage = (seriesName) => animeImageMap[normalizeTitle(seriesName)] || "";
+    const getSeriesImage = (seriesName) => {
+        const normalizedTitle = normalizeTitle(seriesName);
+        return animeImageMap[normalizedTitle] || localSeriesImageFallbacks[normalizedTitle] || "";
+    };
     const activeSeriesImage =
         getSeriesImage(activeSeries?.name) || `${process.env.PUBLIC_URL}/${data.image}`;
 
