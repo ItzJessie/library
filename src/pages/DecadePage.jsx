@@ -122,6 +122,18 @@ const toAbsoluteImageUrl = (apiBase, path) => {
     return `${apiBase}/${String(path).replace(/^\/+/, "")}`;
 };
 
+const toLocalPublicImageUrl = (path) => {
+    if (!path) {
+        return "";
+    }
+
+    if (/^https?:\/\//i.test(path)) {
+        return path;
+    }
+
+    return `${process.env.PUBLIC_URL}/${String(path).replace(/^\/+/, "")}`;
+};
+
 const localSeriesImageFallbacks = {
     "zeta gundam": `${process.env.PUBLIC_URL}/images/zeta-gundam-poster.jpeg`,
     "princess mononoke": `${process.env.PUBLIC_URL}/images/princess-monoke-poster.png`
@@ -146,7 +158,7 @@ const buildSeriesPreview = (detail) => {
 
 const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
-        ? "https://demo-backend.onrender.com"
+        ? "https://demo-backend-1-0t5d.onrender.com"
         : "http://localhost:3001";
 
 const isLocalhostUrl = (value) =>
@@ -174,7 +186,7 @@ const resolveApiBaseUrl = () => {
     return (explicitBaseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, "");
 };
 
-const ANIME_API_PATH = "/get";
+const ANIME_API_PATH = "/api/anime";
 
 const DecadePage = () => {
     const navigate = useNavigate();
@@ -294,12 +306,18 @@ const DecadePage = () => {
         return <Navigate to="/" replace />;
     }
 
-    const getSeriesImage = (seriesName) => {
+    const getSeriesImage = (series) => {
+        const seriesName = series?.name || "";
         const normalizedTitle = normalizeTitle(seriesName);
-        return animeImageMap[normalizedTitle] || localSeriesImageFallbacks[normalizedTitle] || "";
+        return (
+            animeImageMap[normalizedTitle] ||
+            localSeriesImageFallbacks[normalizedTitle] ||
+            toLocalPublicImageUrl(resolveApiImagePath(series)) ||
+            ""
+        );
     };
     const activeSeriesImage =
-        getSeriesImage(activeSeries?.name) || `${process.env.PUBLIC_URL}/${data.image}`;
+        getSeriesImage(activeSeries) || toLocalPublicImageUrl(data.image);
 
     const handleExploreAllFromEra = async () => {
         setApiLoading(true);
@@ -408,7 +426,7 @@ const DecadePage = () => {
                             <div id="influential-series-content" className="series-layout">
                                 <div className="series-list">
                                     {data.series.map((item, index) => {
-                                        const syncedImage = getSeriesImage(item.name);
+                                        const syncedImage = getSeriesImage(item);
                                         return (
                                         <article
                                             className={`series-item ${
@@ -611,9 +629,9 @@ const DecadePage = () => {
                                 </div>
 
                                 <div className="series-detail-body">
-                                    {getSeriesImage(focusedSeries.name) && (
+                                    {getSeriesImage(focusedSeries) && (
                                         <img
-                                            src={getSeriesImage(focusedSeries.name)}
+                                            src={getSeriesImage(focusedSeries)}
                                             alt={`${focusedSeries.name} full art`}
                                             className="series-detail-image"
                                             loading="lazy"

@@ -6,7 +6,7 @@ import { useEraInteractions } from "../hooks/useEraInteractions";
 
 const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
-        ? "https://demo-backend.onrender.com"
+        ? "https://demo-backend-1-0t5d.onrender.com"
         : "http://localhost:3001";
 
 const isLocalhostUrl = (value) =>
@@ -110,6 +110,30 @@ const normalizeStudiosCreatorsData = (payload) => {
     return { studios, creators };
 };
 
+const getPublicAssetBasePath = () => String(process.env.PUBLIC_URL || "").replace(/\/+$/, "");
+
+const resolvePublicAssetUrl = (imagePath) => {
+    if (!imagePath) {
+        return "";
+    }
+
+    const normalizedImagePath = String(imagePath).trim();
+    if (!normalizedImagePath) {
+        return "";
+    }
+
+    if (/^https?:\/\//i.test(normalizedImagePath)) {
+        return normalizedImagePath;
+    }
+
+    const normalizedRelativePath = normalizedImagePath.replace(/^\/+/, "");
+    const publicBasePath = getPublicAssetBasePath();
+
+    return publicBasePath
+        ? `${publicBasePath}/${normalizedRelativePath}`
+        : `/${normalizedRelativePath}`;
+};
+
 const resolveBackendImageUrl = (imagePath, baseUrl) => {
     if (!imagePath) {
         return "";
@@ -129,16 +153,24 @@ const resolveBackendImageUrl = (imagePath, baseUrl) => {
     return `${normalizedBaseUrl}/${normalizedRelativePath}`;
 };
 
-const withResolvedImages = (data, baseUrl) => ({
+const withResolvedImages = (data, baseUrl, options = {}) => {
+    const { preferPublicAssets = false } = options;
+    const resolveImage = (imagePath) =>
+        preferPublicAssets
+            ? resolvePublicAssetUrl(imagePath)
+            : resolveBackendImageUrl(imagePath, baseUrl);
+
+    return {
     studios: (data.studios || []).map((studio) => ({
         ...studio,
-        image: resolveBackendImageUrl(studio.image, baseUrl)
+        image: resolveImage(studio.image)
     })),
     creators: (data.creators || []).map((creator) => ({
         ...creator,
-        image: resolveBackendImageUrl(creator.image, baseUrl)
+        image: resolveImage(creator.image)
     }))
-});
+    };
+};
 
 const extractEra = (meta = "") => {
     const match = meta.match(/Era:\s*([^;]+)/i);
@@ -293,7 +325,11 @@ const StudiosCreators = () => {
                 setStudiosCreators(withResolvedImages(normalizedData, API_BASE_URL));
             } catch (error) {
                 if (error.name !== "AbortError") {
-                    setStudiosCreators(withResolvedImages(fallbackStudiosCreatorsData, API_BASE_URL));
+                    setStudiosCreators(
+                        withResolvedImages(fallbackStudiosCreatorsData, API_BASE_URL, {
+                            preferPublicAssets: true
+                        })
+                    );
                 }
             }
         };

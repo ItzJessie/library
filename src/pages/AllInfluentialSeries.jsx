@@ -225,7 +225,7 @@ const getGenreTone = (genre) => {
     return colorEntry ? colorEntry[1] : (normalizedGenre.length * 17) % 360;
 };
 
-const DEMO_ANIME_API_BASE_URL = "https://demo-backend.onrender.com";
+const DEMO_ANIME_API_BASE_URL = "https://demo-backend-1-0t5d.onrender.com";
 
 const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
@@ -261,21 +261,33 @@ const resolveAnimeApiBaseUrl = () => {
 };
 
 const resolveAnimeApiBaseUrls = () => {
-    const preferredBaseUrl = resolveAnimeApiBaseUrl();
-    const candidates = [preferredBaseUrl];
-    const hasExplicitBaseUrl = Boolean(
-        process.env.REACT_APP_ANIME_API_BASE_URL || process.env.REACT_APP_API_URL
-    );
+    const explicitBaseUrl =
+        process.env.REACT_APP_ANIME_API_BASE_URL ||
+        process.env.REACT_APP_API_URL ||
+        "";
 
-    if (!hasExplicitBaseUrl && preferredBaseUrl !== DEMO_ANIME_API_BASE_URL) {
-        candidates.push(DEMO_ANIME_API_BASE_URL);
+    const preferredBaseUrl = resolveAnimeApiBaseUrl();
+
+    if (explicitBaseUrl) {
+        return [preferredBaseUrl];
     }
 
-    return candidates;
+    return [preferredBaseUrl, DEMO_ANIME_API_BASE_URL].filter(
+        (candidate, index, list) => candidate && list.indexOf(candidate) === index
+    );
 };
 
-const ANIME_API_PATH = "/get";
-const ANIME_CREATE_API_PATH_CANDIDATES = ["/add", "/create", "/new"];
+const ANIME_API_PATH = "/api/anime";
+const ANIME_CREATE_API_PATH = (() => {
+    const explicitPath = String(process.env.REACT_APP_ANIME_CREATE_API_PATH || "").trim();
+    if (!explicitPath) {
+        return ANIME_API_PATH;
+    }
+
+    return explicitPath.startsWith("/") ? explicitPath : `/${explicitPath}`;
+})();
+const ANIME_API_MAX_RETRIES = 3;
+const ANIME_API_RETRY_DELAY_MS = 1200;
 
 const toUploadImagePath = (fileName) => {
     const normalizedName = String(fileName || "")
@@ -527,6 +539,61 @@ const normalizeRemoteImage = (imgName, apiBaseUrl) => {
     return `${normalizedApiBase}/${normalizedImagePath}`;
 };
 
+const waitForRetry = (delayMs, signal) =>
+    new Promise((resolve, reject) => {
+        const timerId = setTimeout(() => {
+            resolve();
+        }, delayMs);
+
+        if (!signal) {
+            return;
+        }
+
+        const handleAbort = () => {
+            clearTimeout(timerId);
+            reject(new DOMException("Retry aborted", "AbortError"));
+        };
+
+        if (signal.aborted) {
+            handleAbort();
+            return;
+        }
+
+        signal.addEventListener("abort", handleAbort, { once: true });
+    });
+
+const fetchAnimePayloadWithRetry = async (baseUrl, signal) => {
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= ANIME_API_MAX_RETRIES; attempt += 1) {
+        try {
+            const response = await fetch(`${baseUrl}${ANIME_API_PATH}`, { signal });
+
+            if (!response.ok) {
+                throw new Error(`API responded with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+            if (!Array.isArray(payload)) {
+                throw new Error("API payload for anime list is not an array");
+            }
+
+            return payload;
+        } catch (error) {
+            if (error.name === "AbortError") {
+                throw error;
+            }
+
+            lastError = error;
+            if (attempt < ANIME_API_MAX_RETRIES) {
+                await waitForRetry(ANIME_API_RETRY_DELAY_MS * attempt, signal);
+            }
+        }
+    }
+
+    throw lastError || new Error("Anime API request failed after retries");
+};
+
 const AllInfluentialSeries = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -564,7 +631,7 @@ const AllInfluentialSeries = () => {
     const timelineTransitionTimersRef = useRef([]);
     const location = useLocation();
     const animeApiBaseUrls = useMemo(() => resolveAnimeApiBaseUrls(), []);
-    const [animeApiBaseUrl, setAnimeApiBaseUrl] = useState(animeApiBaseUrls[0]);
+    const [animeApiBaseUrl, setAnimeApiBaseUrl] = useState(animeApiBaseUrls[0] || "");
 
     // Mobile UX improvements
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -581,18 +648,10 @@ const AllInfluentialSeries = () => {
 
                 for (const baseUrl of animeApiBaseUrls) {
                     try {
-                        const response = await fetch(`${baseUrl}${ANIME_API_PATH}`, {
-                            signal: abortController.signal
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`API responded with status ${response.status}`);
-                        }
-
-                        const payload = await response.json();
-                        if (!Array.isArray(payload)) {
-                            throw new Error("API payload for anime list is not an array");
-                        }
+                        const payload = await fetchAnimePayloadWithRetry(
+                            baseUrl,
+                            abortController.signal
+                        );
 
                         setAnimeApiBaseUrl(baseUrl);
                         setRemoteAnimeSeries(payload);
@@ -756,7 +815,7 @@ const AllInfluentialSeries = () => {
                 let lastError = null;
 
                 for (const baseUrl of animeApiBaseUrls) {
-                    for (const path of ANIME_CREATE_API_PATH_CANDIDATES) {
+                    for (const path of [ANIME_CREATE_API_PATH]) {
                         try {
                             const response = await fetch(`${baseUrl}${path}`, {
                                 method: "POST",
@@ -840,7 +899,14 @@ const AllInfluentialSeries = () => {
                     }
                 }
 
-                throw lastError || new Error("Could not locate a working create endpoint on the backend.");
+                throw (
+                    lastError ||
+                    new Error(
+                        `Backend at ${animeApiBaseUrls.join(
+                            " or "
+                        )} does not expose a create endpoint at ${ANIME_CREATE_API_PATH}.`
+                    )
+                );
             } catch (error) {
                 setCreateAnimeStatus({
                     type: "error",
