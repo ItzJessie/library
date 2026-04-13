@@ -11,6 +11,7 @@ const featuredCards = [
         title: "Popular Animation",
         period: "Mid 1980s",
         meta: "The rise of iconic sci-fi and action anime.",
+        to: "/1980s",
         image: `${process.env.PUBLIC_URL}/images/image (1).png`,
         alt: "Popular animation still",
         toneClass: "gold-1"
@@ -20,6 +21,7 @@ const featuredCards = [
         title: "Longest Animation",
         period: "1980-1990s",
         meta: "Explore the longest-running anime series.",
+        to: "/1990s",
         image: `${process.env.PUBLIC_URL}/images/image (2).png`,
         alt: "Longest animation still",
         toneClass: "gold-2"
@@ -29,6 +31,7 @@ const featuredCards = [
         title: "Color Animation",
         period: "1990-2000s",
         meta: "Vibrant and colorful anime from the 90s and 2000s.",
+        to: "/2000s",
         image: `${process.env.PUBLIC_URL}/images/image (3).png`,
         alt: "Color animation still",
         toneClass: "gold-3"
@@ -42,6 +45,7 @@ const archiveCards = [
         subtitle: "Astro Boy (Tetsuwan Atom)",
         detail:
             "Japan's first major TV anime series established the production model that shaped the industry for decades.",
+        to: "/anime-eras",
         image: `${process.env.PUBLIC_URL}/images/image (4).png`,
         alt: "Early 1960s still"
     },
@@ -50,6 +54,7 @@ const archiveCards = [
         title: "Early 1980s",
         subtitle: "Nausicaa of the Valley of the Wind",
         detail: "A landmark film that signaled a new wave of environmental storytelling.",
+        to: "/1980s",
         image: `${process.env.PUBLIC_URL}/images/image.png`,
         alt: "Early 1980s still"
     },
@@ -58,9 +63,46 @@ const archiveCards = [
         title: "Late 1980s",
         subtitle: "Akira",
         detail: "A genre-defining breakthrough that redefined perceptions of anime through cinematic scale and cyberpunk themes.",
+        to: "/1980s",
         image: `${process.env.PUBLIC_URL}/images/image (5).png`,
         alt: "Late 1980s still",
         wide: true
+    }
+];
+
+const timelineChips = [
+    { id: "1917", label: "1917", to: "/anime-eras" },
+    { id: "1930s", label: "1930s", to: "/anime-eras" },
+    { id: "1960s", label: "1960s", to: "/anime-eras" },
+    { id: "1980s", label: "1980s", to: "/1980s" },
+    { id: "2000s", label: "2000s", to: "/2000s" },
+    { id: "2020s", label: "2020s", to: "/2020s" }
+];
+
+const quickJumpTiles = [
+    {
+        id: "jump-1960s",
+        title: "Start at 1960s",
+        description: "Kick off with the foundational TV era.",
+        to: "/anime-eras"
+    },
+    {
+        id: "jump-cyberpunk",
+        title: "Cyberpunk Classics",
+        description: "Explore Akira-era sci-fi landmarks.",
+        to: "/1980s"
+    },
+    {
+        id: "jump-founders",
+        title: "Studio Founders",
+        description: "See the creators and studios behind key movements.",
+        to: "/studios-creators"
+    },
+    {
+        id: "jump-favorites",
+        title: "User Favorites",
+        description: "Browse community-backed picks and feedback.",
+        to: "/user-feedback"
     }
 ];
 
@@ -98,7 +140,7 @@ const Home = () => {
                     </div>
                     <div className="home-search-preview-grid">
                         {searchPreview.results.slice(0, 6).map((entry) => (
-                            <article className="home-search-result-card" key={entry.id}>
+                            <Link className="home-search-result-card" key={entry.id} to={entry.route}>
                                 <p className="home-search-result-type">{entry.type}</p>
                                 <h3>{entry.title}</h3>
                                 <p>{entry.subtitle}</p>
@@ -106,10 +148,10 @@ const Home = () => {
                                     {entry.era && <span>{entry.era}</span>}
                                     {entry.mood && <span>{entry.mood}</span>}
                                 </div>
-                                <Link className="home-search-result-link" to={entry.route}>
-                                    Open
-                                </Link>
-                            </article>
+                                <span className="home-search-result-link" aria-hidden="true">
+                                    Open <span className="home-card-arrow">&rarr;</span>
+                                </span>
+                            </Link>
                         ))}
                     </div>
                 </section>
@@ -143,9 +185,30 @@ const Home = () => {
                         <Link className="timeline-button" to="/anime-eras">View Timeline</Link>
                     </div>
                     <div className="timeline-links reveal reveal-up">
-                        <p>1917 - 1930s - 1960s - 1980s - 2000s - 2020s</p>
+                        <div className="timeline-chip-list" aria-label="Timeline quick links">
+                            {timelineChips.map((chip) => (
+                                <Link key={chip.id} className="timeline-chip" to={chip.to}>
+                                    {chip.label}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </aside>
+
+                <section className="home-quick-jump reveal reveal-up" aria-label="Quick jump">
+                    <h2>Quick Jump</h2>
+                    <div className="home-quick-jump-grid">
+                        {quickJumpTiles.map((tile) => (
+                            <Link className="home-quick-jump-tile" key={tile.id} to={tile.to}>
+                                <h3>{tile.title}</h3>
+                                <p>{tile.description}</p>
+                                <span className="home-quick-jump-cta" aria-hidden="true">
+                                    Explore <span className="home-card-arrow">&rarr;</span>
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
 
                 <section className="video-section reveal reveal-up" aria-labelledby="video-feature-heading">
                     <h2 id="video-feature-heading">Watch: The Evolution of Anime</h2>

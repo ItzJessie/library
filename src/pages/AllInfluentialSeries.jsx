@@ -286,6 +286,9 @@ const ANIME_CREATE_API_PATH = (() => {
 
     return explicitPath.startsWith("/") ? explicitPath : `/${explicitPath}`;
 })();
+const ANIME_CREATE_API_PATH_CANDIDATES = [ANIME_API_PATH, ANIME_CREATE_API_PATH].filter(
+    (candidate, index, list) => candidate && list.indexOf(candidate) === index
+);
 const ANIME_API_MAX_RETRIES = 3;
 const ANIME_API_RETRY_DELAY_MS = 1200;
 
@@ -815,7 +818,7 @@ const AllInfluentialSeries = () => {
                 let lastError = null;
 
                 for (const baseUrl of animeApiBaseUrls) {
-                    for (const path of [ANIME_CREATE_API_PATH]) {
+                    for (const path of ANIME_CREATE_API_PATH_CANDIDATES) {
                         try {
                             const response = await fetch(`${baseUrl}${path}`, {
                                 method: "POST",
@@ -831,7 +834,19 @@ const AllInfluentialSeries = () => {
 
                             const responseData = await response.json().catch(() => null);
 
-                            if (!response.ok) {
+                            if (response.status === 400 || response.status === 409) {
+                                const serverMessage =
+                                    responseData?.message ||
+                                    responseData?.error ||
+                                    (response.status === 409
+                                        ? "A matching anime already exists."
+                                        : "Validation failed. Please review your input.");
+                                const handledError = new Error(serverMessage);
+                                handledError.stopRetry = true;
+                                throw handledError;
+                            }
+
+                            if (response.status !== 201) {
                                 const serverMessage =
                                     responseData?.message ||
                                     responseData?.error ||
@@ -845,37 +860,43 @@ const AllInfluentialSeries = () => {
 
                             setAnimeApiBaseUrl(baseUrl);
                             setAnimeSource("api");
-                            setRemoteAnimeSeries((previous) => {
-                                const next =
-                                    Array.isArray(previous) && previous.length > 0
-                                        ? [...previous]
-                                        : animeSource === "local"
-                                            ? [...animeSeries]
-                                            : [];
-                                const duplicateIndex = next.findIndex((entry) => {
-                                    const sameTitle =
-                                        String(entry?.title || entry?.name || "").trim().toLowerCase() ===
-                                        normalizedRecord.title.toLowerCase();
-                                    const sameYear = Number(entry?.year) === Number(normalizedRecord.year);
-                                    return sameTitle && sameYear;
+                            try {
+                                const refreshedPayload = await fetchAnimePayloadWithRetry(baseUrl);
+                                setRemoteAnimeSeries(refreshedPayload);
+                                setAnimeSourceMessage(
+                                    `Loaded ${refreshedPayload.length} titles from backend API.`
+                                );
+                            } catch (refreshError) {
+                                setRemoteAnimeSeries((previous) => {
+                                    const next = Array.isArray(previous) ? [...previous] : [];
+                                    const duplicateIndex = next.findIndex((entry) => {
+                                        const sameTitle =
+                                            String(entry?.title || entry?.name || "")
+                                                .trim()
+                                                .toLowerCase() === normalizedRecord.title.toLowerCase();
+                                        const sameYear = Number(entry?.year) === Number(normalizedRecord.year);
+                                        return sameTitle && sameYear;
+                                    });
+
+                                    if (duplicateIndex >= 0) {
+                                        next[duplicateIndex] = {
+                                            ...next[duplicateIndex],
+                                            ...normalizedRecord
+                                        };
+                                        return next;
+                                    }
+
+                                    return [normalizedRecord, ...next];
                                 });
-
-                                if (duplicateIndex >= 0) {
-                                    next[duplicateIndex] = {
-                                        ...next[duplicateIndex],
-                                        ...normalizedRecord
-                                    };
-                                    return next;
-                                }
-
-                                return [normalizedRecord, ...next];
-                            });
+                                setAnimeSourceMessage(
+                                    "Saved to backend, but list refresh failed so a local optimistic update was applied."
+                                );
+                            }
 
                             setCreateAnimeStatus({
                                 type: "success",
-                                message: `Saved \"${normalizedRecord.title}\" to the server and updated the archive.`
+                                message: `Saved \"${normalizedRecord.title}\" to the server via POST ${path} and refreshed the archive.`
                             });
-                            setAnimeSourceMessage("Archive refreshed with your new submission.");
                             setNewAnimeForm({
                                 title: "",
                                 year: "",
@@ -894,6 +915,9 @@ const AllInfluentialSeries = () => {
                             });
                             return;
                         } catch (error) {
+                            if (error?.stopRetry) {
+                                throw error;
+                            }
                             lastError = error;
                         }
                     }
@@ -902,9 +926,9 @@ const AllInfluentialSeries = () => {
                 throw (
                     lastError ||
                     new Error(
-                        `Backend at ${animeApiBaseUrls.join(
-                            " or "
-                        )} does not expose a create endpoint at ${ANIME_CREATE_API_PATH}.`
+                        `Backend at ${animeApiBaseUrls.join(" or ")} does not expose a working POST create endpoint. Tried ${ANIME_CREATE_API_PATH_CANDIDATES.join(
+                            ", "
+                        )}.`
                     )
                 );
             } catch (error) {
