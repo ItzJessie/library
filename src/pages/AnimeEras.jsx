@@ -79,7 +79,15 @@ const AnimeEras = () => {
         if (!targetEraId) {
             return;
         }
-        setActiveEra(targetEraId);
+
+        const overlayElement = document.querySelector(
+            `[data-era="${targetEraId}"].era-overlay`
+        );
+
+        if (overlayElement) {
+            openOverlay(overlayElement, targetEraId);
+            setActiveEra(targetEraId);
+        }
     };
 
     return (
@@ -157,6 +165,7 @@ const AnimeEras = () => {
                                         type="button"
                                         data-era={era.id}
                                         onClick={() => handleEraClick(era.id)}
+                                        aria-label={`View ${era.id} era details`}
                                     >
                                         {era.id}
                                     </button>

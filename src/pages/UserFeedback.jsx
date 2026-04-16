@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FeedbackSummaryCard from "../components/FeedbackSummaryCard";
+import "../css/UserFeedbackPage.css";
 
 const feedbackItems = [
     {
@@ -28,6 +29,17 @@ const feedbackItems = [
     }
 ];
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const averageRating = (
+    feedbackItems.reduce((sum, item) => sum + item.rating, 0) / feedbackItems.length
+).toFixed(1);
+
+const roundedAverageRating = Math.round(Number(averageRating));
+
+const averageStars =
+    "★".repeat(roundedAverageRating) + "☆".repeat(Math.max(0, 5 - roundedAverageRating));
+
 const UserFeedback = () => {
     const [status, setStatus] = useState({ type: "", message: "" });
 
@@ -37,18 +49,81 @@ const UserFeedback = () => {
         const formElement = event.currentTarget;
         const formData = new FormData(formElement);
         const name = String(formData.get("name") || "").trim();
+        const email = String(formData.get("email") || "").trim();
+        const ageValue = String(formData.get("age") || "").trim();
+        const rating = String(formData.get("rating") || "").trim();
+        const satisfaction = String(formData.get("satisfaction") || "").trim();
 
         if (!name) {
             setStatus({
                 type: "error",
                 message: "Please enter your name before submitting feedback."
             });
+            formElement.querySelector("#feedback-name")?.focus();
+            return;
+        }
+
+        if (name.length < 2) {
+            setStatus({
+                type: "error",
+                message: "Please enter a name with at least 2 characters."
+            });
+            formElement.querySelector("#feedback-name")?.focus();
+            return;
+        }
+
+        if (!email) {
+            setStatus({
+                type: "error",
+                message: "Please enter your email before submitting feedback."
+            });
+            formElement.querySelector("#feedback-email")?.focus();
+            return;
+        }
+
+        if (!EMAIL_PATTERN.test(email)) {
+            setStatus({
+                type: "error",
+                message: "Please enter a valid email address."
+            });
+            formElement.querySelector("#feedback-email")?.focus();
+            return;
+        }
+
+        if (ageValue) {
+            const age = Number(ageValue);
+
+            if (!Number.isInteger(age) || age < 5 || age > 120) {
+                setStatus({
+                    type: "error",
+                    message: "Please enter a valid age between 5 and 120."
+                });
+                formElement.querySelector("#feedback-age")?.focus();
+                return;
+            }
+        }
+
+        if (!rating) {
+            setStatus({
+                type: "error",
+                message: "Please select a page rating before submitting feedback."
+            });
+            formElement.querySelector("#rating-5")?.focus();
+            return;
+        }
+
+        if (!satisfaction) {
+            setStatus({
+                type: "error",
+                message: "Please share your satisfaction feedback before submitting."
+            });
+            formElement.querySelector("#feedback-satisfaction")?.focus();
             return;
         }
 
         setStatus({
             type: "success",
-            message: "Thanks for sharing your feedback."
+            message: `Thanks for sharing your feedback, ${name}.`
         });
 
         formElement.reset();
@@ -66,7 +141,14 @@ const UserFeedback = () => {
                     <div className="feedback-grid">
                         <label className="field" htmlFor="feedback-name">
                             <span>Name:</span>
-                            <input id="feedback-name" type="text" name="name" placeholder="John Doe" />
+                            <input
+                                id="feedback-name"
+                                type="text"
+                                name="name"
+                                placeholder="John Doe"
+                                autoComplete="name"
+                                required
+                            />
                         </label>
                         <label className="field" htmlFor="feedback-phone">
                             <span>Phone:</span>
@@ -75,11 +157,20 @@ const UserFeedback = () => {
                                 type="tel"
                                 name="phone"
                                 placeholder="(555) 123-4567"
+                                autoComplete="tel"
                             />
                         </label>
                         <label className="field" htmlFor="feedback-age">
                             <span>Age:</span>
-                            <input id="feedback-age" type="text" name="age" placeholder="19" />
+                            <input
+                                id="feedback-age"
+                                type="number"
+                                name="age"
+                                placeholder="19"
+                                min="5"
+                                max="120"
+                                inputMode="numeric"
+                            />
                         </label>
                         <label className="field" htmlFor="feedback-email">
                             <span>Email:</span>
@@ -88,6 +179,8 @@ const UserFeedback = () => {
                                 type="email"
                                 name="email"
                                 placeholder="john.doe@example.com"
+                                autoComplete="email"
+                                required
                             />
                         </label>
                     </div>
@@ -98,28 +191,60 @@ const UserFeedback = () => {
                             name="satisfaction"
                             rows="3"
                             placeholder="Tell us what worked well and what could improve."
+                            required
                         ></textarea>
                     </label>
                     <div className="rating-row">
                         <span>Rate this page:</span>
                         <div className="rating-stars" role="radiogroup" aria-label="Page rating">
-                            <input id="rating-5" type="radio" name="rating" value="5" />
+                            <input
+                                id="rating-5"
+                                type="radio"
+                                name="rating"
+                                value="5"
+                                aria-label="5 out of 5 stars"
+                                required
+                            />
                             <label htmlFor="rating-5" title="5 stars">
                                 &#9733;
                             </label>
-                            <input id="rating-4" type="radio" name="rating" value="4" />
+                            <input
+                                id="rating-4"
+                                type="radio"
+                                name="rating"
+                                value="4"
+                                aria-label="4 out of 5 stars"
+                            />
                             <label htmlFor="rating-4" title="4 stars">
                                 &#9733;
                             </label>
-                            <input id="rating-3" type="radio" name="rating" value="3" />
+                            <input
+                                id="rating-3"
+                                type="radio"
+                                name="rating"
+                                value="3"
+                                aria-label="3 out of 5 stars"
+                            />
                             <label htmlFor="rating-3" title="3 stars">
                                 &#9733;
                             </label>
-                            <input id="rating-2" type="radio" name="rating" value="2" />
+                            <input
+                                id="rating-2"
+                                type="radio"
+                                name="rating"
+                                value="2"
+                                aria-label="2 out of 5 stars"
+                            />
                             <label htmlFor="rating-2" title="2 stars">
                                 &#9733;
                             </label>
-                            <input id="rating-1" type="radio" name="rating" value="1" />
+                            <input
+                                id="rating-1"
+                                type="radio"
+                                name="rating"
+                                value="1"
+                                aria-label="1 out of 5 stars"
+                            />
                             <label htmlFor="rating-1" title="1 star">
                                 &#9733;
                             </label>
@@ -138,7 +263,11 @@ const UserFeedback = () => {
                         Submit Feedback
                     </button>
                     {status.message ? (
-                        <div className={`form-feedback ${status.type}`.trim()} role="status" aria-live="polite">
+                        <div
+                            className={`form-feedback ${status.type}`.trim()}
+                            role={status.type === "error" ? "alert" : "status"}
+                            aria-live={status.type === "error" ? "assertive" : "polite"}
+                        >
                             <p>{status.message}</p>
                         </div>
                     ) : null}
@@ -148,9 +277,15 @@ const UserFeedback = () => {
                     <h2>Feedback Summary</h2>
                     <div className="summary-rating">
                         <h3>Average Rating</h3>
-                        <div className="star-row is-gold" aria-hidden="true">
-                            &#9733;&#9733;&#9733;&#9733;&#9733;
+                        <div
+                            className="star-row is-gold"
+                            aria-label={`Average user rating ${averageRating} out of 5`}
+                        >
+                            {averageStars}
                         </div>
+                        <p className="summary-score">
+                            {averageRating} / 5 based on {feedbackItems.length} reviews
+                        </p>
                     </div>
                     <div className="summary-scroll">
                         {feedbackItems.map((item) => (

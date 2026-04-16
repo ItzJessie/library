@@ -69,7 +69,7 @@ const About = () => {
                 </div>
 
                 <div className="about-column">
-                    <h2>References &amp; Sources</h2>
+                    <h2 id="references">References &amp; Sources</h2>
                     <article className="about-card is-taller">
                         <div className="card-header">
                             <h3>Data Sources</h3>
@@ -79,10 +79,46 @@ const About = () => {
                             databases and studio documentation:
                         </p>
                         <ul className="reference-list">
-                            <li><a href="https://www.animenewsnetwork.com/">Anime News Network</a></li>
-                            <li><a href="https://myanimelist.net/">MyAnimeList</a></li>
-                            <li><a href="https://www.imdb.com/">IMDb</a></li>
-                            <li><a href="https://www.studio-ghibli.jp/">Studio Ghibli Official Site</a></li>
+                            <li>
+                                <a
+                                    href="https://www.animenewsnetwork.com/"
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    aria-label="Open Anime News Network in a new tab"
+                                >
+                                    Anime News Network
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="https://myanimelist.net/"
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    aria-label="Open MyAnimeList in a new tab"
+                                >
+                                    MyAnimeList
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="https://www.imdb.com/"
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    aria-label="Open IMDb in a new tab"
+                                >
+                                    IMDb
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="https://www.studio-ghibli.jp/"
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    aria-label="Open Studio Ghibli official site in a new tab"
+                                >
+                                    Studio Ghibli Official Site
+                                </a>
+                            </li>
                         </ul>
                     </article>
                 </div>

@@ -205,6 +205,7 @@ const DecadePage = () => {
         influentialSeries: true,
         eraHighlights: true,
         eraImpact: true,
+        connections: true,
         apiExplorer: false
     });
 
@@ -256,6 +257,42 @@ const DecadePage = () => {
 
     useEffect(() => {
         setFocusedSeriesExpanded(false);
+    }, [focusedSeries]);
+
+    useEffect(() => {
+        setActiveSeriesIndex(0);
+        setFocusedSeries(null);
+        setFocusedSeriesExpanded(false);
+        setApiMatches([]);
+        setApiError("");
+    }, [decade]);
+
+    useEffect(() => {
+        if (!focusedSeries || typeof document === "undefined") {
+            return;
+        }
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [focusedSeries]);
+
+    useEffect(() => {
+        if (!focusedSeries || typeof window === "undefined") {
+            return;
+        }
+
+        const handleKeydown = (event) => {
+            if (event.key === "Escape") {
+                setFocusedSeries(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeydown);
+        return () => window.removeEventListener("keydown", handleKeydown);
     }, [focusedSeries]);
 
     useEffect(() => {
@@ -331,10 +368,10 @@ const DecadePage = () => {
 
             const payload = await response.json();
             const list = Array.isArray(payload) ? payload : [];
-            const knownTitles = new Set((data.series || []).map((item) => item.name.toLowerCase()));
+            const knownTitles = new Set((data.series || []).map((item) => normalizeTitle(item.name)));
 
             const matches = list.filter((item) => {
-                const title = String(item.title || "").toLowerCase();
+                const title = normalizeTitle(item.title || item.name);
                 return knownTitles.has(title);
             });
 
@@ -543,14 +580,14 @@ const DecadePage = () => {
                                 <button
                                     type="button"
                                     className="decade-section-toggle"
-                                    onClick={() => toggleSection("eraImpact")}
-                                    aria-expanded={expandedSections.eraImpact}
+                                    onClick={() => toggleSection("connections")}
+                                    aria-expanded={expandedSections.connections}
                                     aria-controls="connections-content"
                                 >
-                                    {expandedSections.eraImpact ? "−" : "+"}
+                                    {expandedSections.connections ? "−" : "+"}
                                 </button>
                             </div>
-                            {expandedSections.eraImpact && (
+                            {expandedSections.connections && (
                             <ul id="connections-content">
                                 {(eraConnections[decade] || []).map((entry) => (
                                     <li key={entry}>{entry}</li>
@@ -608,8 +645,12 @@ const DecadePage = () => {
                             role="dialog"
                             aria-modal="true"
                             aria-labelledby="series-detail-title"
+                            onClick={() => setFocusedSeries(null)}
                         >
-                            <div className="series-detail-shell">
+                            <div
+                                className="series-detail-shell"
+                                onClick={(event) => event.stopPropagation()}
+                            >
                                 <div className="series-detail-header">
                                     <div>
                                         <p className="series-detail-kicker">Series spotlight</p>

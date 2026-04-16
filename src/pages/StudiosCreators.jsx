@@ -9,6 +9,14 @@ const getDefaultApiBaseUrl = () =>
         ? "https://demo-backend-1-0t5d.onrender.com"
         : "http://localhost:3001";
 
+const getIsMobileViewport = () => {
+    if (typeof window === "undefined") {
+        return false;
+    }
+
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+};
+
 const isLocalhostUrl = (value) =>
     /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(String(value || "").trim());
 
@@ -100,14 +108,44 @@ const TITLE_GENRE_MAP = {
 };
 
 const normalizeStudiosCreatorsData = (payload) => {
+    const normalizeRelated = (related) =>
+        Array.isArray(related)
+            ? related
+                .map((entry) => String(entry || "").trim())
+                .filter(Boolean)
+            : [];
+
+    const normalizeStudio = (studio = {}) => ({
+        name: String(studio.name || "Unknown Studio").trim(),
+        image: String(studio.image || "").trim(),
+        meta: String(studio.meta || "").trim(),
+        detail: String(studio.detail || "").trim(),
+        related: normalizeRelated(studio.related)
+    });
+
+    const normalizeCreator = (creator = {}) => ({
+        name: String(creator.name || "Unknown Creator").trim(),
+        image: String(creator.image || "").trim(),
+        role: String(creator.role || "Role: N/A").trim(),
+        affiliation: String(creator.affiliation || "Studio Affiliations: N/A").trim(),
+        detail: String(creator.detail || "").trim(),
+        related: normalizeRelated(creator.related)
+    });
+
     if (!payload || typeof payload !== "object") {
-        return fallbackStudiosCreatorsData;
+        return {
+            studios: (fallbackStudiosCreatorsData.studios || []).map(normalizeStudio),
+            creators: (fallbackStudiosCreatorsData.creators || []).map(normalizeCreator)
+        };
     }
 
     const studios = Array.isArray(payload.studios) ? payload.studios : fallbackStudiosCreatorsData.studios;
     const creators = Array.isArray(payload.creators) ? payload.creators : fallbackStudiosCreatorsData.creators;
 
-    return { studios, creators };
+    return {
+        studios: studios.map(normalizeStudio),
+        creators: creators.map(normalizeCreator)
+    };
 };
 
 const getPublicAssetBasePath = () => String(process.env.PUBLIC_URL || "").replace(/\/+$/, "");
@@ -275,12 +313,16 @@ const normalizeConnectedAnime = (payload, fallbackList) => {
 const StudiosCreators = () => {
     useEraInteractions();
 
-    const [studiosCreators, setStudiosCreators] = useState(fallbackStudiosCreatorsData);
+    const [studiosCreators, setStudiosCreators] = useState(() =>
+        withResolvedImages(normalizeStudiosCreatorsData(fallbackStudiosCreatorsData), API_BASE_URL, {
+            preferPublicAssets: true
+        })
+    );
     const [openMenu, setOpenMenu] = useState(null);
     const [activeTab, setActiveTab] = useState("studios");
     const [searchTerm, setSearchTerm] = useState("");
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-    const [isMobileView, setIsMobileView] = useState(window.innerWidth <= MOBILE_BREAKPOINT);
+    const [isMobileView, setIsMobileView] = useState(getIsMobileViewport);
     const [showJumpTop, setShowJumpTop] = useState(false);
     const [visibleCount, setVisibleCount] = useState({
         studio: MOBILE_BATCH_SIZE,
@@ -343,7 +385,7 @@ const StudiosCreators = () => {
 
     useEffect(() => {
         const onResize = () => {
-            setIsMobileView(window.innerWidth <= MOBILE_BREAKPOINT);
+            setIsMobileView(getIsMobileViewport());
         };
 
         const onScroll = () => {
@@ -1018,12 +1060,14 @@ const StudiosCreators = () => {
                             <h4>Connected Anime</h4>
                             {isLoadingConnectedAnime ? (
                                 <p>Loading connected anime...</p>
-                            ) : (
+                            ) : connectedAnime.length > 0 ? (
                                 <div className="connected-anime-list">
                                     {connectedAnime.map((title) => (
                                         <span key={`${selectedProfile.profile.name}-${title}`}>{title}</span>
                                     ))}
                                 </div>
+                            ) : (
+                                <p>No connected anime available.</p>
                             )}
                         </section>
                     </div>

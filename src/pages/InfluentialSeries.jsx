@@ -3,38 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import SeriesListCard from "../components/SeriesListCard";
 import Slideshow from "../components/Slideshow";
 import { archiveSeries, featuredSeries } from "../data/siteData";
+import animeSeries from "../data/animeSeries.json";
 import { useEraInteractions } from "../hooks/useEraInteractions";
 import "../css/InfluentialSeriesPage.css";
 
-const animeDatabase = [
-    { name: "Attack on Titan", id: "series-attack-on-titan" },
-    { name: "Frieren", id: "series-frieren" },
-    { name: "One Piece", id: "series-one-piece" },
-    { name: "Death Note", id: "series-death-note" },
-    { name: "Vinland Saga", id: "series-vinland-saga" },
-    { name: "Psycho Pass", id: "series-psycho-pass" },
-    { name: "Demon Slayer", id: "series-demon-slayer" },
-    { name: "Fullmetal Alchemist", id: "series-fullmetal-alchemist" },
-    { name: "Hunter x Hunter", id: "series-hunter-x-hunter" },
-    { name: "One Punch Man", id: "series-one-punch-man" },
-    { name: "Chainsaw Man", id: "series-chainsaw-man" },
-    { name: "JoJo's Bizarre Adventure", id: "series-jojo-bizarre-adventure" },
-    { name: "Bleach", id: "series-bleach" },
-    { name: "Cyberpunk: Edgerunners", id: "series-cyberpunk-edgerunners" },
-    { name: "Code Geass", id: "series-code-geass" },
-    { name: "Princess Mononoke", id: "series-princess-mononoke" },
-    { name: "Cowboy Bebop", id: "series-cowboy-bebop" },
-    { name: "Dandadan", id: "series-dandadan" },
-    { name: "Dragon Ball Z", id: "series-dragon-ball-z" },
-    { name: "Steins;Gate", id: "series-steins-gate" },
-    { name: "Spy x Family", id: "series-spy-family" },
-    { name: "Ghost in the Shell", id: "series-ghost-in-the-shell" },
-    { name: "Pokemon", id: "series-pokemon" },
-    { name: "Mushoku Tensei", id: "series-mushoku-tensei" },
-    { name: "Mob Psycho 100", id: "series-mob-psycho-100" },
-    { name: "Tokyo Ghoul", id: "series-tokyo-ghoul" },
-    { name: "Hellsing", id: "series-hellsing" }
-];
+const buildSeriesId = (title) =>
+    `series-${title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")}`;
 
 const InfluentialSeries = () => {
     const navigate = useNavigate();
@@ -47,26 +25,22 @@ const InfluentialSeries = () => {
     const [archiveRotationIndex, setArchiveRotationIndex] = useState(0);
     const searchFormRef = useRef(null);
 
+    const animeDatabase = useMemo(() => {
+        const uniqueTitles = Array.from(
+            new Set(
+                animeSeries
+                    .map((entry) => String(entry.title || "").trim())
+                    .filter(Boolean)
+            )
+        );
+
+        return uniqueTitles.map((name) => ({
+            name,
+            id: buildSeriesId(name)
+        }));
+    }, []);
+
     const trimmedSearchTerm = searchTerm.toLowerCase().trim();
-
-    const archiveTitleMatches = useMemo(
-        () =>
-            archiveSeries.some((series) =>
-                series.title.toLowerCase().includes(trimmedSearchTerm)
-            ),
-        [trimmedSearchTerm]
-    );
-
-    const featuredTitleMatches = useMemo(
-        () =>
-            featuredSeries.some((series) =>
-                series.title.toLowerCase().includes(trimmedSearchTerm)
-            ),
-        [trimmedSearchTerm]
-    );
-
-    const hasVisibleCards =
-        trimmedSearchTerm.length === 0 || archiveTitleMatches || featuredTitleMatches;
 
     const suggestions = useMemo(() => {
         if (trimmedSearchTerm.length < 1) {
@@ -76,7 +50,7 @@ const InfluentialSeries = () => {
         return animeDatabase
             .filter((anime) => anime.name.toLowerCase().includes(trimmedSearchTerm))
             .slice(0, 6);
-    }, [trimmedSearchTerm]);
+    }, [animeDatabase, trimmedSearchTerm]);
 
     const showSuggestions = isSearchFocused && suggestions.length > 0;
 
@@ -117,6 +91,27 @@ const InfluentialSeries = () => {
             );
         });
     }, [activeArchiveFilter]);
+
+    const visibleArchiveTitleMatches = useMemo(
+        () =>
+            filteredArchiveSeries.some((series) =>
+                series.title.toLowerCase().includes(trimmedSearchTerm)
+            ),
+        [filteredArchiveSeries, trimmedSearchTerm]
+    );
+
+    const visibleFeaturedTitleMatches = useMemo(
+        () =>
+            featuredSeries.some((series) =>
+                series.title.toLowerCase().includes(trimmedSearchTerm)
+            ),
+        [trimmedSearchTerm]
+    );
+
+    const hasVisibleCards =
+        trimmedSearchTerm.length === 0 ||
+        visibleArchiveTitleMatches ||
+        visibleFeaturedTitleMatches;
 
     const rotatedArchiveSeries = useMemo(() => {
         if (filteredArchiveSeries.length <= 1) {

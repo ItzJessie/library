@@ -289,6 +289,7 @@ const ANIME_CREATE_API_PATH = (() => {
 const ANIME_CREATE_API_PATH_CANDIDATES = [ANIME_API_PATH, ANIME_CREATE_API_PATH].filter(
     (candidate, index, list) => candidate && list.indexOf(candidate) === index
 );
+const ANIME_EDIT_DELETE_API_PATH = "/api/anime";
 const ANIME_API_MAX_RETRIES = 3;
 const ANIME_API_RETRY_DELAY_MS = 1200;
 
@@ -377,8 +378,10 @@ const validateAnimeCreatePayload = (payload) => {
 
 const normalizeCreatedAnimeRecord = (record, fallbackPayload) => {
     const source = record && typeof record === "object" ? record : {};
+    const resolvedId = Number(source._id ?? source.id ?? fallbackPayload?._id);
 
     return {
+        _id: Number.isInteger(resolvedId) && resolvedId > 0 ? resolvedId : undefined,
         title: source.title || fallbackPayload.title,
         img_name: source.img_name || source.image || fallbackPayload.img_name,
         year: Number(source.year || fallbackPayload.year),
@@ -628,6 +631,24 @@ const AllInfluentialSeries = () => {
     const [newAnimeImageLabel, setNewAnimeImageLabel] = useState("");
     const [isSubmittingAnime, setIsSubmittingAnime] = useState(false);
     const [createAnimeStatus, setCreateAnimeStatus] = useState({ type: "idle", message: "" });
+    const [selectedManageSeriesId, setSelectedManageSeriesId] = useState("");
+    const [editAnimeForm, setEditAnimeForm] = useState({
+        title: "",
+        year: "",
+        studio: "",
+        genre: "",
+        episodes: "",
+        synopsis: "",
+        img_name: ""
+    });
+    const [editAnimeErrors, setEditAnimeErrors] = useState({});
+    const [editAnimeImagePreviewUrl, setEditAnimeImagePreviewUrl] = useState("");
+    const [editAnimeImageLabel, setEditAnimeImageLabel] = useState("");
+    const [isUpdatingAnime, setIsUpdatingAnime] = useState(false);
+    const [isDeletingAnime, setIsDeletingAnime] = useState(false);
+    const [editAnimeStatus, setEditAnimeStatus] = useState({ type: "idle", message: "" });
+    const [deleteAnimeStatus, setDeleteAnimeStatus] = useState({ type: "idle", message: "" });
+    const [activeFormModal, setActiveFormModal] = useState(null);
     const searchFormRef = useRef(null);
     const timelineRailRef = useRef(null);
     const timelineButtonRefs = useRef({});
@@ -895,7 +916,7 @@ const AllInfluentialSeries = () => {
 
                             setCreateAnimeStatus({
                                 type: "success",
-                                message: `Saved \"${normalizedRecord.title}\" to the server via POST ${path} and refreshed the archive.`
+                                message: `Saved "${normalizedRecord.title}" to the server via POST ${path} and refreshed the archive.`
                             });
                             setNewAnimeForm({
                                 title: "",
@@ -945,23 +966,448 @@ const AllInfluentialSeries = () => {
 
     const allSeries = useMemo(
         () =>
-            animeDataset.map((series) => ({
-                id: buildSeriesId(series.title || series.name || "unknown-series"),
-                title: series.title || series.name || "Untitled Anime",
-                image:
-                    animeSource === "api"
-                        ? normalizeRemoteImage(series.img_name || series.image, animeApiBaseUrl)
-                        : `${process.env.PUBLIC_URL}/${series.img_name || series.image || ""}`,
-                year: Number(series.year) || new Date().getFullYear(),
-                era: series.era || getEraLabel(Number(series.year) || new Date().getFullYear()),
-                studio: series.studio || "Unknown Studio",
-                genre: series.genre || "Unknown",
-                genres: String(series.genre || "Unknown").split(",").map((item) => item.trim()),
-                episodes: Number(series.episodes) || 0,
-                synopsis: series.synopsis || "No synopsis available yet."
-            })),
+            animeDataset.map((series) => {
+                const title = series.title || series.name || "Untitled Anime";
+                const year = Number(series.year) || new Date().getFullYear();
+                const serverId = Number(series?._id ?? series?.id);
+
+                return {
+                    id: buildSeriesId(title || "unknown-series"),
+                    serverId: Number.isInteger(serverId) && serverId > 0 ? serverId : null,
+                    title,
+                    image:
+                        animeSource === "api"
+                            ? normalizeRemoteImage(series.img_name || series.image, animeApiBaseUrl)
+                            : `${process.env.PUBLIC_URL}/${series.img_name || series.image || ""}`,
+                    year,
+                    era: series.era || getEraLabel(year),
+                    studio: series.studio || "Unknown Studio",
+                    genre: series.genre || "Unknown",
+                    genres: String(series.genre || "Unknown").split(",").map((item) => item.trim()),
+                    episodes: Number(series.episodes) || 0,
+                    synopsis: series.synopsis || "No synopsis available yet."
+                };
+            }),
         [animeApiBaseUrl, animeDataset, animeSource]
     );
+
+    const manageableSeries = useMemo(
+        () =>
+            allSeries
+                .filter((series) => Number.isInteger(series.serverId) && series.serverId > 0)
+                .sort((left, right) => left.title.localeCompare(right.title)),
+        [allSeries]
+    );
+
+    const selectedManageSeries = useMemo(
+        () =>
+            manageableSeries.find(
+                (series) => String(series.serverId) === String(selectedManageSeriesId)
+            ) || null,
+        [manageableSeries, selectedManageSeriesId]
+    );
+
+    useEffect(() => {
+        if (!manageableSeries.length) {
+            if (selectedManageSeriesId) {
+                setSelectedManageSeriesId("");
+            }
+            return;
+        }
+
+        const hasSelectedSeries = manageableSeries.some(
+            (series) => String(series.serverId) === String(selectedManageSeriesId)
+        );
+
+        if (!hasSelectedSeries) {
+            setSelectedManageSeriesId(String(manageableSeries[0].serverId));
+        }
+    }, [manageableSeries, selectedManageSeriesId]);
+
+    useEffect(() => {
+        if (!selectedManageSeries) {
+            setEditAnimeForm({
+                title: "",
+                year: "",
+                studio: "",
+                genre: "",
+                episodes: "",
+                synopsis: "",
+                img_name: ""
+            });
+            return;
+        }
+
+        setEditAnimeForm({
+            title: selectedManageSeries.title,
+            year: String(selectedManageSeries.year),
+            studio: selectedManageSeries.studio,
+            genre: selectedManageSeries.genre,
+            episodes: String(selectedManageSeries.episodes),
+            synopsis: selectedManageSeries.synopsis,
+            img_name:
+                animeSource === "api"
+                    ? String(
+                          animeDataset.find(
+                              (item) =>
+                                  String(Number(item?._id ?? item?.id)) ===
+                                  String(selectedManageSeries.serverId)
+                          )?.img_name || ""
+                      )
+                    : ""
+        });
+        setEditAnimeImageLabel("");
+        setEditAnimeImagePreviewUrl((previous) => {
+            if (previous) {
+                URL.revokeObjectURL(previous);
+            }
+            return "";
+        });
+        setEditAnimeErrors({});
+        setEditAnimeStatus({ type: "idle", message: "" });
+        setDeleteAnimeStatus({ type: "idle", message: "" });
+    }, [animeDataset, animeSource, selectedManageSeries]);
+
+    useEffect(
+        () => () => {
+            if (editAnimeImagePreviewUrl) {
+                URL.revokeObjectURL(editAnimeImagePreviewUrl);
+            }
+        },
+        [editAnimeImagePreviewUrl]
+    );
+
+    const handleEditAnimeFieldChange = useCallback((event) => {
+        const { name, value } = event.target;
+
+        setEditAnimeForm((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+
+        setEditAnimeErrors((previous) => {
+            if (!previous[name]) {
+                return previous;
+            }
+
+            const nextErrors = { ...previous };
+            delete nextErrors[name];
+            return nextErrors;
+        });
+
+        if (editAnimeStatus.type !== "idle") {
+            setEditAnimeStatus({ type: "idle", message: "" });
+        }
+    }, [editAnimeStatus.type]);
+
+    const handleEditAnimeImageChange = useCallback((event) => {
+        const selectedFile = event.target.files?.[0] || null;
+
+        setEditAnimeErrors((previous) => {
+            if (!previous.img_name) {
+                return previous;
+            }
+
+            const nextErrors = { ...previous };
+            delete nextErrors.img_name;
+            return nextErrors;
+        });
+
+        if (!selectedFile) {
+            setEditAnimeImageLabel("");
+            setEditAnimeImagePreviewUrl((previous) => {
+                if (previous) {
+                    URL.revokeObjectURL(previous);
+                }
+                return "";
+            });
+            return;
+        }
+
+        const imagePath = toUploadImagePath(selectedFile.name);
+        const previewUrl = URL.createObjectURL(selectedFile);
+
+        setEditAnimeImageLabel(selectedFile.name);
+        setEditAnimeForm((previous) => ({
+            ...previous,
+            img_name: imagePath
+        }));
+        setEditAnimeImagePreviewUrl((previous) => {
+            if (previous) {
+                URL.revokeObjectURL(previous);
+            }
+            return previewUrl;
+        });
+
+        if (editAnimeStatus.type !== "idle") {
+            setEditAnimeStatus({ type: "idle", message: "" });
+        }
+    }, [editAnimeStatus.type]);
+
+    const handleEditAnimeSubmit = useCallback(
+        async (event) => {
+            event.preventDefault();
+
+            const targetId = Number(selectedManageSeriesId);
+            if (!Number.isInteger(targetId) || targetId <= 0) {
+                setEditAnimeStatus({
+                    type: "error",
+                    message: "Select an existing backend item before editing."
+                });
+                return;
+            }
+
+            const payload = {
+                title: editAnimeForm.title.trim(),
+                year: Number(editAnimeForm.year),
+                studio: editAnimeForm.studio.trim(),
+                genre: editAnimeForm.genre.trim(),
+                episodes: Number(editAnimeForm.episodes),
+                synopsis: editAnimeForm.synopsis.trim(),
+                img_name: editAnimeForm.img_name.trim(),
+                era: getEraLabel(Number(editAnimeForm.year))
+            };
+
+            const errors = validateAnimeCreatePayload(payload);
+            if (Object.keys(errors).length > 0) {
+                setEditAnimeErrors(errors);
+                setEditAnimeStatus({
+                    type: "error",
+                    message: "Please fix the highlighted edit fields before saving."
+                });
+                return;
+            }
+
+            setEditAnimeErrors({});
+            setIsUpdatingAnime(true);
+            setEditAnimeStatus({ type: "idle", message: "" });
+
+            try {
+                let lastError = null;
+                const candidateBaseUrls = [animeApiBaseUrl, ...animeApiBaseUrls].filter(
+                    (candidate, index, list) =>
+                        candidate && list.indexOf(candidate) === index
+                );
+
+                for (const baseUrl of candidateBaseUrls) {
+                    try {
+                        const response = await fetch(
+                            `${baseUrl}${ANIME_EDIT_DELETE_API_PATH}/${targetId}`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(payload)
+                            }
+                        );
+
+                        const responseData = await response.json().catch(() => null);
+
+                        if (response.status === 400 || response.status === 409 || response.status === 404) {
+                            const serverMessage =
+                                responseData?.message ||
+                                responseData?.error ||
+                                (response.status === 404
+                                    ? "The selected anime no longer exists on the server."
+                                    : response.status === 409
+                                        ? "A matching anime already exists."
+                                        : "Validation failed. Please review your input.");
+                            const handledError = new Error(serverMessage);
+                            handledError.stopRetry = true;
+                            throw handledError;
+                        }
+
+                        if (response.status !== 200) {
+                            const serverMessage =
+                                responseData?.message ||
+                                responseData?.error ||
+                                `Server rejected the request with status ${response.status}.`;
+                            throw new Error(serverMessage);
+                        }
+
+                        const updatedRecord =
+                            responseData?.data || responseData?.anime || responseData?.item || responseData;
+                        const normalizedRecord = normalizeCreatedAnimeRecord(updatedRecord, {
+                            ...payload,
+                            _id: targetId
+                        });
+
+                        setAnimeApiBaseUrl(baseUrl);
+                        setAnimeSource("api");
+                        setRemoteAnimeSeries((previous) =>
+                            previous.map((entry) => {
+                                const entryId = Number(entry?._id ?? entry?.id);
+                                if (entryId !== targetId) {
+                                    return entry;
+                                }
+
+                                return {
+                                    ...entry,
+                                    ...normalizedRecord,
+                                    _id: targetId
+                                };
+                            })
+                        );
+
+                        setSelectedSeries((previous) => {
+                            if (!previous || Number(previous.serverId) !== targetId) {
+                                return previous;
+                            }
+
+                            return {
+                                ...previous,
+                                title: normalizedRecord.title,
+                                year: Number(normalizedRecord.year),
+                                era: normalizedRecord.era,
+                                studio: normalizedRecord.studio,
+                                genre: normalizedRecord.genre,
+                                genres: String(normalizedRecord.genre)
+                                    .split(",")
+                                    .map((item) => item.trim()),
+                                episodes: Number(normalizedRecord.episodes),
+                                synopsis: normalizedRecord.synopsis,
+                                image: normalizeRemoteImage(normalizedRecord.img_name, baseUrl)
+                            };
+                        });
+
+                        setEditAnimeStatus({
+                            type: "success",
+                            message: `Saved changes to "${normalizedRecord.title}" and updated the archive instantly.`
+                        });
+                        setEditAnimeImageLabel("");
+                        setEditAnimeImagePreviewUrl((previous) => {
+                            if (previous) {
+                                URL.revokeObjectURL(previous);
+                            }
+                            return "";
+                        });
+                        setAnimeSourceMessage(
+                            `Live update: "${normalizedRecord.title}" was edited successfully on the backend.`
+                        );
+                        return;
+                    } catch (error) {
+                        if (error?.stopRetry) {
+                            throw error;
+                        }
+                        lastError = error;
+                    }
+                }
+
+                throw (
+                    lastError ||
+                    new Error(
+                        `Backend at ${animeApiBaseUrls.join(" or ")} does not expose a working PUT endpoint at ${ANIME_EDIT_DELETE_API_PATH}/:id.`
+                    )
+                );
+            } catch (error) {
+                setEditAnimeStatus({
+                    type: "error",
+                    message: error.message || "Unable to edit this anime right now."
+                });
+            } finally {
+                setIsUpdatingAnime(false);
+            }
+        },
+            [animeApiBaseUrl, animeApiBaseUrls, editAnimeForm, selectedManageSeriesId]
+    );
+
+    const handleDeleteAnime = useCallback(async () => {
+        const targetId = Number(selectedManageSeriesId);
+        if (!Number.isInteger(targetId) || targetId <= 0 || !selectedManageSeries) {
+            setDeleteAnimeStatus({
+                type: "error",
+                message: "Select an existing backend item before deleting."
+            });
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Delete "${selectedManageSeries.title}" from the backend archive?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        setIsDeletingAnime(true);
+        setDeleteAnimeStatus({ type: "idle", message: "" });
+
+        try {
+            let lastError = null;
+            const candidateBaseUrls = [animeApiBaseUrl, ...animeApiBaseUrls].filter(
+                (candidate, index, list) => candidate && list.indexOf(candidate) === index
+            );
+
+            for (const baseUrl of candidateBaseUrls) {
+                try {
+                    const response = await fetch(
+                        `${baseUrl}${ANIME_EDIT_DELETE_API_PATH}/${targetId}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+
+                    const responseData = await response.json().catch(() => null);
+
+                    if (response.status === 404 || response.status === 400) {
+                        const handledError = new Error(
+                            responseData?.message ||
+                                responseData?.error ||
+                                "The selected anime could not be deleted."
+                        );
+                        handledError.stopRetry = true;
+                        throw handledError;
+                    }
+
+                    if (response.status !== 200) {
+                        throw new Error(
+                            responseData?.message ||
+                                responseData?.error ||
+                                `Server rejected the request with status ${response.status}.`
+                        );
+                    }
+
+                    setAnimeApiBaseUrl(baseUrl);
+                    setAnimeSource("api");
+                    setRemoteAnimeSeries((previous) =>
+                        previous.filter((entry) => Number(entry?._id ?? entry?.id) !== targetId)
+                    );
+                    setSelectedSeries((previous) =>
+                        previous && Number(previous.serverId) === targetId ? null : previous
+                    );
+                    setDeleteAnimeStatus({
+                        type: "success",
+                        message: `Deleted "${selectedManageSeries.title}" from the backend archive.`
+                    });
+                    setEditAnimeStatus({ type: "idle", message: "" });
+                    setAnimeSourceMessage(
+                        `Live update: "${selectedManageSeries.title}" was deleted successfully on the backend.`
+                    );
+                    return;
+                } catch (error) {
+                    if (error?.stopRetry) {
+                        throw error;
+                    }
+                    lastError = error;
+                }
+            }
+
+            throw (
+                lastError ||
+                new Error(
+                    `Backend at ${animeApiBaseUrls.join(" or ")} does not expose a working DELETE endpoint at ${ANIME_EDIT_DELETE_API_PATH}/:id.`
+                )
+            );
+        } catch (error) {
+            setDeleteAnimeStatus({
+                type: "error",
+                message: error.message || "Unable to delete this anime right now."
+            });
+        } finally {
+            setIsDeletingAnime(false);
+        }
+    }, [animeApiBaseUrl, animeApiBaseUrls, selectedManageSeries, selectedManageSeriesId]);
 
     const selectedTimelineIndex = useMemo(() => {
         if (selectedTimelineEra === "all") {
@@ -1196,7 +1642,7 @@ const AllInfluentialSeries = () => {
     }, []);
 
     useEffect(() => {
-        if (!selectedSeries) {
+        if (!selectedSeries && !activeFormModal) {
             return undefined;
         }
 
@@ -1205,7 +1651,12 @@ const AllInfluentialSeries = () => {
 
         const handleEscape = (event) => {
             if (event.key === "Escape") {
-                setSelectedSeries(null);
+                if (selectedSeries) {
+                    setSelectedSeries(null);
+                    return;
+                }
+
+                setActiveFormModal(null);
             }
         };
 
@@ -1215,7 +1666,7 @@ const AllInfluentialSeries = () => {
             window.removeEventListener("keydown", handleEscape);
             document.body.style.overflow = previousOverflow;
         };
-    }, [selectedSeries]);
+    }, [activeFormModal, selectedSeries]);
 
     useEffect(() => {
         const selectedButton =
@@ -1506,169 +1957,30 @@ const AllInfluentialSeries = () => {
                 </div>
             </section>
 
-            <section className="all-series-create-panel" aria-labelledby="add-series-heading">
+            <section className="all-series-form-launchers" aria-labelledby="archive-forms-heading">
                 <div className="all-series-create-panel__intro">
-                    <h2 id="add-series-heading">Add New Influential Series</h2>
+                    <h2 id="archive-forms-heading">Archive Management</h2>
                     <p>
-                        Share a title with the archive. Client validation mirrors backend Joi-style rules,
-                        then successful submissions are posted to the server and immediately shown in this list.
+                        Keep this page minimal by opening forms only when needed. Add new titles or edit/delete
+                        existing backend records in focused popups.
                     </p>
                 </div>
-
-                <form className="all-series-create-form" onSubmit={handleCreateAnimeSubmit}>
-                    <label htmlFor="create-anime-title">
-                        <span>Title</span>
-                        <input
-                            id="create-anime-title"
-                            name="title"
-                            type="text"
-                            value={newAnimeForm.title}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="e.g. Mob Psycho 100"
-                            required
-                            minLength="1"
-                            aria-invalid={Boolean(newAnimeErrors.title)}
-                        />
-                        {newAnimeErrors.title && <small>{newAnimeErrors.title}</small>}
-                    </label>
-
-                    <label htmlFor="create-anime-year">
-                        <span>Year</span>
-                        <input
-                            id="create-anime-year"
-                            name="year"
-                            type="number"
-                            required
-                            min="1900"
-                            max="2100"
-                            step="1"
-                            value={newAnimeForm.year}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="2021"
-                            aria-invalid={Boolean(newAnimeErrors.year)}
-                        />
-                        {newAnimeErrors.year && <small>{newAnimeErrors.year}</small>}
-                    </label>
-
-                    <label htmlFor="create-anime-studio">
-                        <span>Studio</span>
-                        <input
-                            id="create-anime-studio"
-                            name="studio"
-                            type="text"
-                            value={newAnimeForm.studio}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="Bones"
-                            required
-                            minLength="1"
-                            aria-invalid={Boolean(newAnimeErrors.studio)}
-                        />
-                        {newAnimeErrors.studio && <small>{newAnimeErrors.studio}</small>}
-                    </label>
-
-                    <label htmlFor="create-anime-genre">
-                        <span>Genre</span>
-                        <input
-                            id="create-anime-genre"
-                            name="genre"
-                            type="text"
-                            value={newAnimeForm.genre}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="Action, Supernatural"
-                            required
-                            minLength="1"
-                            aria-invalid={Boolean(newAnimeErrors.genre)}
-                        />
-                        {newAnimeErrors.genre && <small>{newAnimeErrors.genre}</small>}
-                    </label>
-
-                    <label htmlFor="create-anime-episodes">
-                        <span>Episodes</span>
-                        <input
-                            id="create-anime-episodes"
-                            name="episodes"
-                            type="number"
-                            required
-                            min="1"
-                            step="1"
-                            value={newAnimeForm.episodes}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="24"
-                            aria-invalid={Boolean(newAnimeErrors.episodes)}
-                        />
-                        {newAnimeErrors.episodes && <small>{newAnimeErrors.episodes}</small>}
-                    </label>
-
-                    <div className="all-series-create-form__image-section is-wide">
-                        <div className="all-series-create-form__image-preview">
-                            <div className="preview-container">
-                                {newAnimeImagePreviewUrl ? (
-                                    <img
-                                        key={newAnimeImagePreviewUrl}
-                                        src={newAnimeImagePreviewUrl}
-                                        alt="Poster preview"
-                                    />
-                                ) : null}
-                                <div
-                                    className="preview-placeholder"
-                                    style={newAnimeImagePreviewUrl ? { display: "none" } : {}}
-                                >
-                                    <span>Poster Preview</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <label className="all-series-create-form__image-input" htmlFor="create-anime-img-name">
-                            <span>Choose Poster Image</span>
-                            <input
-                                id="create-anime-img-name"
-                                name="poster_file"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleNewAnimeImageChange}
-                                required
-                                aria-invalid={Boolean(newAnimeErrors.img_name)}
-                            />
-                            <p className="all-series-create-form__image-name">
-                                {newAnimeImageLabel || "No file selected"}
-                            </p>
-                            {newAnimeErrors.img_name && <small>{newAnimeErrors.img_name}</small>}
-                        </label>
-                    </div>
-
-                    <label className="is-wide" htmlFor="create-anime-synopsis">
-                        <span>Synopsis</span>
-                        <textarea
-                            id="create-anime-synopsis"
-                            name="synopsis"
-                            rows="4"
-                            value={newAnimeForm.synopsis}
-                            onChange={handleNewAnimeFieldChange}
-                            placeholder="A quick synopsis of the series and why it stands out."
-                            required
-                            minLength="1"
-                            aria-invalid={Boolean(newAnimeErrors.synopsis)}
-                        ></textarea>
-                        {newAnimeErrors.synopsis && <small>{newAnimeErrors.synopsis}</small>}
-                    </label>
-
-                    <div className="all-series-create-form__actions is-wide">
-                        <button type="submit" disabled={isSubmittingAnime}>
-                            {isSubmittingAnime ? "Saving..." : "Add Series to Archive"}
-                        </button>
-                        <p>Server target: {animeApiBaseUrl}</p>
-                    </div>
-
-                    {createAnimeStatus.type !== "idle" && (
-                        <div
-                            className={`all-series-create-form__status is-${createAnimeStatus.type}`}
-                            role="status"
-                            aria-live="polite"
-                        >
-                            {createAnimeStatus.message}
-                        </div>
-                    )}
-                </form>
+                <div className="all-series-form-launchers__actions">
+                    <button
+                        type="button"
+                        className="all-series-form-launchers__button"
+                        onClick={() => setActiveFormModal("create")}
+                    >
+                        Add New Influential Series
+                    </button>
+                    <button
+                        type="button"
+                        className="all-series-form-launchers__button is-manage"
+                        onClick={() => setActiveFormModal("manage")}
+                    >
+                        Edit or Delete Existing Series
+                    </button>
+                </div>
             </section>
 
             <section className="all-series-controls" aria-label="Filter and sort influential series">
@@ -1888,7 +2200,7 @@ const AllInfluentialSeries = () => {
                                 </div>
                             </div>
 
-                            <div className="all-series-body">
+                            <div className="all-series-body" data-era={series.timelinePlacement}>
                                 <h2>{series.title}</h2>
                                 <p className="all-series-subline">
                                     {series.year} · {series.studio}
@@ -1960,6 +2272,429 @@ const AllInfluentialSeries = () => {
                     role="presentation"
                     aria-hidden="true"
                 />
+            )}
+
+            {activeFormModal === "create" && (
+                <div
+                    className="all-series-form-modal-backdrop"
+                    role="presentation"
+                    onClick={() => setActiveFormModal(null)}
+                >
+                    <section
+                        className="all-series-form-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="create-series-heading"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="all-series-form-modal__close"
+                            onClick={() => setActiveFormModal(null)}
+                            aria-label="Close add series form"
+                        >
+                            ×
+                        </button>
+
+                        <div className="all-series-create-panel__intro">
+                            <h2 id="create-series-heading">Add New Influential Series</h2>
+                            <p>
+                                Share a title with the archive. Client validation mirrors backend Joi-style rules,
+                                then successful submissions are posted to the server and immediately shown in this list.
+                            </p>
+                        </div>
+
+                        <form className="all-series-create-form" onSubmit={handleCreateAnimeSubmit}>
+                            <label htmlFor="create-anime-title">
+                                <span>Title</span>
+                                <input
+                                    id="create-anime-title"
+                                    name="title"
+                                    type="text"
+                                    value={newAnimeForm.title}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="e.g. Mob Psycho 100"
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(newAnimeErrors.title)}
+                                />
+                                {newAnimeErrors.title && <small>{newAnimeErrors.title}</small>}
+                            </label>
+
+                            <label htmlFor="create-anime-year">
+                                <span>Year</span>
+                                <input
+                                    id="create-anime-year"
+                                    name="year"
+                                    type="number"
+                                    required
+                                    min="1960"
+                                    max={createAnimeFieldRules.year.max}
+                                    step="1"
+                                    value={newAnimeForm.year}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="2021"
+                                    aria-invalid={Boolean(newAnimeErrors.year)}
+                                />
+                                {newAnimeErrors.year && <small>{newAnimeErrors.year}</small>}
+                            </label>
+
+                            <label htmlFor="create-anime-studio">
+                                <span>Studio</span>
+                                <input
+                                    id="create-anime-studio"
+                                    name="studio"
+                                    type="text"
+                                    value={newAnimeForm.studio}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="Bones"
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(newAnimeErrors.studio)}
+                                />
+                                {newAnimeErrors.studio && <small>{newAnimeErrors.studio}</small>}
+                            </label>
+
+                            <label htmlFor="create-anime-genre">
+                                <span>Genre</span>
+                                <input
+                                    id="create-anime-genre"
+                                    name="genre"
+                                    type="text"
+                                    value={newAnimeForm.genre}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="Action, Supernatural"
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(newAnimeErrors.genre)}
+                                />
+                                {newAnimeErrors.genre && <small>{newAnimeErrors.genre}</small>}
+                            </label>
+
+                            <label htmlFor="create-anime-episodes">
+                                <span>Episodes</span>
+                                <input
+                                    id="create-anime-episodes"
+                                    name="episodes"
+                                    type="number"
+                                    required
+                                    min="1"
+                                    step="1"
+                                    value={newAnimeForm.episodes}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="24"
+                                    aria-invalid={Boolean(newAnimeErrors.episodes)}
+                                />
+                                {newAnimeErrors.episodes && <small>{newAnimeErrors.episodes}</small>}
+                            </label>
+
+                            <div className="all-series-create-form__image-section is-wide">
+                                <div className="all-series-create-form__image-preview">
+                                    <div className="preview-container">
+                                        {newAnimeImagePreviewUrl ? (
+                                            <img
+                                                key={newAnimeImagePreviewUrl}
+                                                src={newAnimeImagePreviewUrl}
+                                                alt="Poster preview"
+                                            />
+                                        ) : null}
+                                        <div
+                                            className="preview-placeholder"
+                                            style={newAnimeImagePreviewUrl ? { display: "none" } : {}}
+                                        >
+                                            <span>Poster Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <label className="all-series-create-form__image-input" htmlFor="create-anime-img-name">
+                                    <span>Choose Poster Image</span>
+                                    <input
+                                        id="create-anime-img-name"
+                                        name="poster_file"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleNewAnimeImageChange}
+                                        required
+                                        aria-invalid={Boolean(newAnimeErrors.img_name)}
+                                    />
+                                    <p className="all-series-create-form__image-name">
+                                        {newAnimeImageLabel || "No file selected"}
+                                    </p>
+                                    {newAnimeErrors.img_name && <small>{newAnimeErrors.img_name}</small>}
+                                </label>
+                            </div>
+
+                            <label className="is-wide" htmlFor="create-anime-synopsis">
+                                <span>Synopsis</span>
+                                <textarea
+                                    id="create-anime-synopsis"
+                                    name="synopsis"
+                                    rows="4"
+                                    value={newAnimeForm.synopsis}
+                                    onChange={handleNewAnimeFieldChange}
+                                    placeholder="A quick synopsis of the series and why it stands out."
+                                    required
+                                    minLength="20"
+                                    aria-invalid={Boolean(newAnimeErrors.synopsis)}
+                                ></textarea>
+                                {newAnimeErrors.synopsis && <small>{newAnimeErrors.synopsis}</small>}
+                            </label>
+
+                            <div className="all-series-create-form__actions is-wide">
+                                <button type="submit" disabled={isSubmittingAnime}>
+                                    {isSubmittingAnime ? "Saving..." : "Add Series to Archive"}
+                                </button>
+                                <p>Server target: {animeApiBaseUrl}</p>
+                            </div>
+
+                            {createAnimeStatus.type !== "idle" && (
+                                <div
+                                    className={`all-series-create-form__status is-${createAnimeStatus.type}`}
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    {createAnimeStatus.message}
+                                </div>
+                            )}
+                        </form>
+                    </section>
+                </div>
+            )}
+
+            {activeFormModal === "manage" && (
+                <div
+                    className="all-series-form-modal-backdrop"
+                    role="presentation"
+                    onClick={() => setActiveFormModal(null)}
+                >
+                    <section
+                        className="all-series-form-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="manage-series-heading"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="all-series-form-modal__close"
+                            onClick={() => setActiveFormModal(null)}
+                            aria-label="Close edit and delete form"
+                        >
+                            ×
+                        </button>
+
+                        <div className="all-series-create-panel__intro">
+                            <h2 id="manage-series-heading">Edit or Delete Existing Series</h2>
+                            <p>
+                                Choose a backend item, update fields using the same Joi-matched validation rules,
+                                then save or delete. Successful updates are reflected instantly without refreshing.
+                            </p>
+                        </div>
+
+                        <form className="all-series-create-form all-series-manage-form" onSubmit={handleEditAnimeSubmit}>
+                            <label className="is-wide" htmlFor="manage-anime-select">
+                                <span>Select Series</span>
+                                <select
+                                    id="manage-anime-select"
+                                    value={selectedManageSeriesId}
+                                    onChange={(event) => {
+                                        setSelectedManageSeriesId(event.target.value);
+                                    }}
+                                    disabled={!manageableSeries.length || isUpdatingAnime || isDeletingAnime}
+                                >
+                                    {manageableSeries.length === 0 && (
+                                        <option value="">No backend records available</option>
+                                    )}
+                                    {manageableSeries.map((series) => (
+                                        <option key={`manage-${series.serverId}`} value={series.serverId}>
+                                            {series.title} ({series.year})
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+
+                            <label htmlFor="edit-anime-title">
+                                <span>Title</span>
+                                <input
+                                    id="edit-anime-title"
+                                    name="title"
+                                    type="text"
+                                    value={editAnimeForm.title}
+                                    onChange={handleEditAnimeFieldChange}
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(editAnimeErrors.title)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                />
+                                {editAnimeErrors.title && <small>{editAnimeErrors.title}</small>}
+                            </label>
+
+                            <label htmlFor="edit-anime-year">
+                                <span>Year</span>
+                                <input
+                                    id="edit-anime-year"
+                                    name="year"
+                                    type="number"
+                                    required
+                                    min="1960"
+                                    max={createAnimeFieldRules.year.max}
+                                    step="1"
+                                    value={editAnimeForm.year}
+                                    onChange={handleEditAnimeFieldChange}
+                                    aria-invalid={Boolean(editAnimeErrors.year)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                />
+                                {editAnimeErrors.year && <small>{editAnimeErrors.year}</small>}
+                            </label>
+
+                            <label htmlFor="edit-anime-studio">
+                                <span>Studio</span>
+                                <input
+                                    id="edit-anime-studio"
+                                    name="studio"
+                                    type="text"
+                                    value={editAnimeForm.studio}
+                                    onChange={handleEditAnimeFieldChange}
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(editAnimeErrors.studio)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                />
+                                {editAnimeErrors.studio && <small>{editAnimeErrors.studio}</small>}
+                            </label>
+
+                            <label htmlFor="edit-anime-genre">
+                                <span>Genre</span>
+                                <input
+                                    id="edit-anime-genre"
+                                    name="genre"
+                                    type="text"
+                                    value={editAnimeForm.genre}
+                                    onChange={handleEditAnimeFieldChange}
+                                    required
+                                    minLength="2"
+                                    aria-invalid={Boolean(editAnimeErrors.genre)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                />
+                                {editAnimeErrors.genre && <small>{editAnimeErrors.genre}</small>}
+                            </label>
+
+                            <label htmlFor="edit-anime-episodes">
+                                <span>Episodes</span>
+                                <input
+                                    id="edit-anime-episodes"
+                                    name="episodes"
+                                    type="number"
+                                    required
+                                    min="1"
+                                    max="2500"
+                                    step="1"
+                                    value={editAnimeForm.episodes}
+                                    onChange={handleEditAnimeFieldChange}
+                                    aria-invalid={Boolean(editAnimeErrors.episodes)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                />
+                                {editAnimeErrors.episodes && <small>{editAnimeErrors.episodes}</small>}
+                            </label>
+
+                            <div className="all-series-create-form__image-section is-wide">
+                                <div className="all-series-create-form__image-preview">
+                                    <div className="preview-container">
+                                        {editAnimeImagePreviewUrl || selectedManageSeries?.image ? (
+                                            <img
+                                                key={editAnimeImagePreviewUrl || selectedManageSeries?.image}
+                                                src={editAnimeImagePreviewUrl || selectedManageSeries?.image}
+                                                alt="Poster preview"
+                                            />
+                                        ) : null}
+                                        <div
+                                            className="preview-placeholder"
+                                            style={
+                                                editAnimeImagePreviewUrl || selectedManageSeries?.image
+                                                    ? { display: "none" }
+                                                    : {}
+                                            }
+                                        >
+                                            <span>Poster Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <label className="all-series-create-form__image-input" htmlFor="edit-anime-img-name">
+                                    <span>Choose Poster Image</span>
+                                    <input
+                                        id="edit-anime-img-name"
+                                        name="edit_poster_file"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleEditAnimeImageChange}
+                                        aria-invalid={Boolean(editAnimeErrors.img_name)}
+                                        disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                    />
+                                    <p className="all-series-create-form__image-name">
+                                        {editAnimeImageLabel || "No new file selected (keeping current poster)"}
+                                    </p>
+                                    {editAnimeErrors.img_name && <small>{editAnimeErrors.img_name}</small>}
+                                </label>
+                            </div>
+
+                            <label className="is-wide" htmlFor="edit-anime-synopsis">
+                                <span>Synopsis</span>
+                                <textarea
+                                    id="edit-anime-synopsis"
+                                    name="synopsis"
+                                    rows="4"
+                                    value={editAnimeForm.synopsis}
+                                    onChange={handleEditAnimeFieldChange}
+                                    required
+                                    minLength="20"
+                                    aria-invalid={Boolean(editAnimeErrors.synopsis)}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                ></textarea>
+                                {editAnimeErrors.synopsis && <small>{editAnimeErrors.synopsis}</small>}
+                            </label>
+
+                            <div className="all-series-create-form__actions all-series-manage-form__actions is-wide">
+                                <button
+                                    type="submit"
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                >
+                                    {isUpdatingAnime ? "Saving Changes..." : "Save Edits"}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="all-series-manage-form__delete-button"
+                                    onClick={handleDeleteAnime}
+                                    disabled={!selectedManageSeries || isUpdatingAnime || isDeletingAnime}
+                                >
+                                    {isDeletingAnime ? "Deleting..." : "Delete Series"}
+                                </button>
+                                <p>Server target: {animeApiBaseUrl}</p>
+                            </div>
+
+                            {editAnimeStatus.type !== "idle" && (
+                                <div
+                                    className={`all-series-create-form__status is-${editAnimeStatus.type}`}
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    {editAnimeStatus.message}
+                                </div>
+                            )}
+
+                            {deleteAnimeStatus.type !== "idle" && (
+                                <div
+                                    className={`all-series-create-form__status is-${deleteAnimeStatus.type}`}
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    {deleteAnimeStatus.message}
+                                </div>
+                            )}
+                        </form>
+                    </section>
+                </div>
             )}
 
             {selectedSeries && (
