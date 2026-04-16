@@ -409,7 +409,7 @@
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 860px) {
     .studios-tabs {
         width: 100%;
         justify-content: center;
@@ -592,7 +592,7 @@ body.theme-dark .compare-btn.is-active {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 860px) {
     .page-studios .studios-hero {
         padding-bottom: 10px;
     }
@@ -726,6 +726,7 @@ body.theme-dark .compare-btn.is-active {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 1;
+        line-clamp: 1;
         overflow: hidden;
     }
 
@@ -740,6 +741,10 @@ body.theme-dark .compare-btn.is-active {
         align-items: center;
         background: rgba(88, 64, 45, 0.12);
         color: #4f3929;
+    }
+
+    .page-studios .interactive-card.is-mobile-card .expand-btn {
+        min-width: 0;
     }
 
     .page-studios .interactive-card.is-mobile-card .info-actions {
@@ -765,6 +770,12 @@ body.theme-dark .load-more-btn {
     color: #f4e7d7;
 }
 
+body.theme-dark .mobile-filter-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #f4e7d7;
+}
+
 body.theme-dark .collapse-toggle-btn {
     background: rgba(40, 30, 24, 0.96);
     border-color: rgba(255, 238, 216, 0.2);
@@ -787,5 +798,13 @@ body.theme-dark .mobile-filter-sheet-panel select,
 body.theme-dark .mobile-filter-sheet-header button {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.24);
+    color: #f4e7d7;
+}
+
+body.theme-dark
+    .page-studios
+    .interactive-card.is-mobile-card
+    .info-quick-stats {
+    background: rgba(255, 255, 255, 0.08);
     color: #f4e7d7;
 }

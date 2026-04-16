@@ -7,6 +7,14 @@
     min-width: 0;
 }
 
+.brand-logo {
+    flex-shrink: 0;
+}
+
+.brand-text {
+    min-width: 0;
+}
+
 .brand-title {
     display: block;
     line-height: 1.1;

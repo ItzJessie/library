@@ -91,6 +91,7 @@
     "_id": 9,
     "title": "Princess Mononoke",
     "img_name": "images/wp12255968 10.png",
+      "img_name": "images/princess-monoke-poster.png",
     "year": 1997,
     "era": "1990s",
     "genre": "Fantasy, Adventure, Drama",
@@ -300,6 +301,7 @@
     "_id": 28,
     "title": "Gundam Wing",
     "img_name": "images/gundam-1280x720.jpg",
+      "img_name": "images/zeta-gundam-poster.jpeg",
     "year": 1995,
     "era": "1990s",
     "genre": "Action, Mecha, Sci-Fi",
@@ -515,5 +517,16 @@
     "synopsis": "A seemingly innocent magical girl story that subverts the genre with dark themes.",
     "studio": "Shaft",
     "episodes": 12
+  },
+  {
+    "_id": 48,
+    "title": "Zeta Gundam",
+    "img_name": "images/gundam-1280x720.jpg",
+    "year": 1984,
+    "era": "1980s",
+    "genre": "Mecha, Military, Sci-Fi",
+    "synopsis": "A darker sequel that deepened the Gundam universe lore with complex political conflicts.",
+    "studio": "Sunrise",
+    "episodes": 50
   }
 ]

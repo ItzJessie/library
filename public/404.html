@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="refresh" content="0; url=/library/#/" />
+        <title>Library</title>
+        <script>
+            (function () {
+                var basePath = "/library/";
+                var locationPath = window.location.pathname;
+                var relativePath =
+                    locationPath.indexOf(basePath) === 0 ?
+                        locationPath.slice(basePath.length)
+                    :   locationPath.replace(/^\/+/, "");
+                var targetPath =
+                    relativePath && relativePath !== "index.html" ?
+                        relativePath
+                    :   "";
+                var redirectUrl =
+                    basePath + "#/" + targetPath.replace(/^\/+/, "");
+
+                window.location.replace(
+                    redirectUrl + window.location.search + window.location.hash,
+                );
+            })();
+        </script>
+    </head>
+    <body></body>
+</html>

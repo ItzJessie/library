@@ -1,11 +1,42 @@
 import { useEffect, useRef, useState } from "react";
+import animeSeries from "../data/animeSeries.json";
 
 const SHEET_CLOSE_THRESHOLD = 96;
 
 const getDefaultApiBaseUrl = () =>
     process.env.NODE_ENV === "production"
-        ? "https://demo-backend.onrender.com"
+        ? "https://demo-backend-1-0t5d.onrender.com"
         : "http://localhost:3001";
+
+const isLocalhostUrl = (value) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(String(value || "").trim());
+
+const isLocalhostRuntime = () => {
+    if (typeof window === "undefined") {
+        return false;
+    }
+
+    return /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+};
+
+const resolveApiBaseUrl = () => {
+    const explicitBaseUrl = process.env.REACT_APP_API_URL || "";
+
+    if (
+        process.env.NODE_ENV === "production" &&
+        isLocalhostUrl(explicitBaseUrl) &&
+        !isLocalhostRuntime()
+    ) {
+        return getDefaultApiBaseUrl();
+    }
+
+    return (explicitBaseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, "");
+};
+
+const findLocalSeriesDetails = (seriesTitle) =>
+    animeSeries.find(
+        (anime) => anime.title.toLowerCase() === seriesTitle.toLowerCase()
+    );
 
 const EraOverlay = ({
     era,
@@ -30,8 +61,10 @@ const EraOverlay = ({
     });
     const sheetStartYRef = useRef(null);
     const sheetOffsetRef = useRef(0);
+    const requestIdRef = useRef(0);
+    const closeButtonRef = useRef(null);
 
-    const API_URL = (process.env.REACT_APP_API_URL || getDefaultApiBaseUrl()).replace(/\/$/, "");
+    const API_URL = resolveApiBaseUrl();
 
     useEffect(() => {
         if (!isOpen) return;
@@ -39,10 +72,9 @@ const EraOverlay = ({
         const handleKeyDown = (e) => {
             if (e.key === "Escape") {
                 if (selectedSeries) {
-                    setSelectedSeries(null);
-                    setSeriesDetails(null);
+                    handleBackToList();
                 } else {
-                    onClose();
+                    handleClose();
                 }
             }
         };
@@ -56,13 +88,24 @@ const EraOverlay = ({
 
     useEffect(() => {
         if (!isOpen) {
+            return;
+        }
+
+        closeButtonRef.current?.focus();
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            requestIdRef.current += 1;
             setSheetOffset(0);
             sheetOffsetRef.current = 0;
             sheetStartYRef.current = null;
             setSelectedSeriesExpanded(false);
+            setLoading(false);
             return;
         }
 
+        requestIdRef.current += 1;
         setSelectedSeries(null);
         setSeriesDetails(null);
         setError(null);
@@ -102,16 +145,19 @@ const EraOverlay = ({
     }, [isOpen, era.id]);
 
     const handleClose = () => {
+        requestIdRef.current += 1;
         setSheetOffset(0);
         sheetOffsetRef.current = 0;
         sheetStartYRef.current = null;
         setSelectedSeriesExpanded(false);
+        setLoading(false);
+        setError(null);
         onClose();
     };
 
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
-            onClose();
+            handleClose();
         }
     };
 
@@ -167,44 +213,87 @@ const EraOverlay = ({
     };
 
     const fetchSeriesDetails = async (seriesTitle) => {
+        const requestId = requestIdRef.current + 1;
+        requestIdRef.current = requestId;
+
         setLoading(true);
         setError(null);
         try {
             const response = await fetch(`${API_URL}/api/anime`);
+
+            if (requestId !== requestIdRef.current) {
+                return;
+            }
+
             if (!response.ok) {
+                const localSeries = findLocalSeriesDetails(seriesTitle);
+                if (localSeries) {
+                    setSeriesDetails(localSeries);
+                    return;
+                }
+
                 throw new Error(`Failed to fetch anime data: ${response.status}`);
             }
             const animeList = await response.json();
+
+            if (requestId !== requestIdRef.current) {
+                return;
+            }
 
             const foundAnime = animeList.find(
                 (anime) => anime.title.toLowerCase() === seriesTitle.toLowerCase()
             );
 
             if (!foundAnime) {
-                setError(`"${seriesTitle}" not found in database`);
-                setSeriesDetails(null);
+                const localSeries = findLocalSeriesDetails(seriesTitle);
+                if (localSeries) {
+                    setSeriesDetails(localSeries);
+                    setError(null);
+                } else {
+                    setError(`"${seriesTitle}" not found in database`);
+                    setSeriesDetails(null);
+                }
             } else {
                 setSeriesDetails(foundAnime);
             }
         } catch (err) {
-            console.error("Error fetching series details:", err);
-            setError(`Unable to load details: ${err.message}`);
+            if (requestId !== requestIdRef.current) {
+                return;
+            }
+
+            const localSeries = findLocalSeriesDetails(seriesTitle);
+            if (localSeries) {
+                setSeriesDetails(localSeries);
+                setError(null);
+            } else {
+                console.error("Error fetching series details:", err);
+                setError("Unable to load details. Please try again.");
+            }
         } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+            }
         }
     };
 
     const handleSeriesClick = (series) => {
+        if (!series?.title) {
+            return;
+        }
+
         setSelectedSeries(series);
         setSeriesDetails(null);
+        setError(null);
         setSelectedSeriesExpanded(false);
         fetchSeriesDetails(series.title);
     };
 
     const handleBackToList = () => {
+        requestIdRef.current += 1;
         setSelectedSeries(null);
         setSeriesDetails(null);
         setError(null);
+        setLoading(false);
         setSelectedSeriesExpanded(false);
     };
 
@@ -424,6 +513,7 @@ const EraOverlay = ({
                             ) : (
                                 <div className="series-detail-view">
                                     <button
+                                        type="button"
                                         className="back-button"
                                         onClick={handleBackToList}
                                         aria-label="Back to list"
@@ -684,8 +774,10 @@ const EraOverlay = ({
                         </div>
 
                         <button
+                            type="button"
                             className="modal-close"
                             data-close
+                            ref={closeButtonRef}
                             onClick={handleClose}
                             aria-label="Close modal"
                         >

@@ -109,6 +109,7 @@ body:not(.theme-dark) .universal-search-shell {
     background: var(--search-backdrop);
     backdrop-filter: blur(6px);
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .universal-search-panel {
@@ -158,6 +159,22 @@ body:not(.theme-dark) .universal-search-shell {
     min-height: 40px;
     min-width: 80px;
     transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.universal-search-close:hover {
+    border-color: rgba(255, 236, 213, 0.72);
+    background: rgba(255, 236, 213, 0.24);
+}
+
+.universal-search-close:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
+}
+
+.universal-search-close:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
 }
 
 .universal-search-input-wrap {
@@ -177,6 +194,12 @@ body:not(.theme-dark) .universal-search-shell {
     min-height: 44px;
     -webkit-appearance: none;
     appearance: none;
+    transition: all 0.2s ease;
+}
+
+.universal-search-input-wrap input:hover {
+    border-color: rgba(255, 226, 197, 0.6);
+    background: rgba(255, 251, 246, 0.16);
 }
 
 .universal-search-input-wrap input::placeholder {
@@ -186,6 +209,7 @@ body:not(.theme-dark) .universal-search-shell {
 .universal-search-input-wrap input:focus {
     outline: 2px solid var(--search-input-focus);
     outline-offset: 1px;
+    border-color: rgba(255, 216, 168, 0.8);
 }
 
 .universal-search-shortcut {
@@ -222,6 +246,17 @@ body:not(.theme-dark) .universal-search-shell {
 .suggestion-pill.is-active,
 .suggestion-pill:hover {
     background: var(--search-pill-active-bg);
+    border-color: rgba(255, 229, 199, 0.6);
+}
+
+.suggestion-pill:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
+}
+
+.suggestion-pill:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
 }
 
 .universal-search-chips {
@@ -244,6 +279,17 @@ body:not(.theme-dark) .universal-search-shell {
     font-size: 0.84rem;
     min-height: 40px;
     transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.chip-select:hover {
+    background: rgba(255, 241, 224, 0.18);
+    border-color: rgba(255, 229, 199, 0.6);
+}
+
+.chip-select:focus-within {
+    background: rgba(255, 241, 224, 0.18);
+    border-color: rgba(255, 229, 199, 0.6);
 }
 
 .chip-select select {
@@ -274,9 +320,29 @@ body:not(.theme-dark) .universal-search-shell {
     flex: 0 1 auto;
 }
 
+.toggle-chip:hover {
+    background: rgba(255, 241, 224, 0.18);
+    border-color: rgba(255, 229, 199, 0.6);
+}
+
+.toggle-chip:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
+}
+
+.toggle-chip:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
+}
+
 .toggle-chip.is-active {
     background: var(--search-chip-active-bg);
     color: var(--search-chip-active-text);
+    border-color: rgba(255, 215, 160, 0.56);
+}
+
+.toggle-chip.is-active:hover {
+    background: rgba(255, 215, 160, 0.42);
 }
 
 .reset-chip {
@@ -314,12 +380,23 @@ body:not(.theme-dark) .universal-search-shell {
     min-height: 80px;
     transition: all 0.2s ease;
     touch-action: manipulation;
+    text-align: left;
 }
 
 .result-card.is-active,
 .result-card:hover {
     border-color: var(--search-card-hover-border);
     background: var(--search-card-hover-bg);
+}
+
+.result-card:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
+}
+
+.result-card:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
 }
 
 .result-type {
@@ -386,6 +463,26 @@ body:not(.theme-dark) .universal-search-shell {
     padding: 7px 14px;
     text-decoration: none;
     font-weight: 700;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.preview-link:hover {
+    filter: brightness(0.92);
+    border-color: rgba(90, 64, 42, 0.65);
+}
+
+.preview-link:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
+}
+
+.preview-link:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 2px;
 }
 
 .people-explore {
@@ -411,6 +508,28 @@ body:not(.theme-dark) .universal-search-shell {
     cursor: pointer;
     min-height: 40px;
     transition: all 0.2s ease;
+    font-size: 0.84rem;
+}
+
+.people-links button:hover,
+.empty-links button:hover,
+.empty-state p button:hover {
+    background: rgba(255, 244, 229, 0.2);
+    border-color: rgba(255, 227, 196, 0.65);
+}
+
+.people-links button:focus,
+.empty-links button:focus,
+.empty-state p button:focus {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
+}
+
+.people-links button:focus-visible,
+.empty-links button:focus-visible,
+.empty-state p button:focus-visible {
+    outline: 2px solid var(--search-input-focus);
+    outline-offset: 1px;
 }
 
 .empty-state {

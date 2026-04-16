@@ -1,0 +1,111 @@
+{
+  "studios": [
+    {
+      "name": "Wit Studio, Inc",
+      "image": "images/wit-studio-one-piece-remake-pros-and-cons-featured 1.png",
+      "meta": "Founding Year: June 1, 2012; Era: 2010s",
+      "detail": "Wit Studio is the Japanese animation studio responsible for producing the first three seasons of Attack on Titan, known for high-quality visuals and dynamic action sequences.",
+      "related": ["Attack on Titan", "Vinland Saga"]
+    },
+    {
+      "name": "MAPPA",
+      "image": "images/mappa-logo.webp",
+      "meta": "Founding Year: June 2011; Era: 2010s",
+      "detail": "MAPPA produced popular series including Jujutsu Kaisen, Kabaneri of the Iron Fortress, and continued Attack on Titan's final seasons with acclaimed animation quality.",
+      "related": ["Chainsaw Man"]
+    },
+    {
+      "name": "Kyoto Animation",
+      "image": "images/kyoto-animation-logo.webp",
+      "meta": "Founding Year: 1981; Era: 2000s",
+      "detail": "Known for The Melancholy of Haruhi Suzumiya, K-On!, and Silent Voice, Kyoto Animation is celebrated for exceptional art direction and character animation.",
+      "related": ["Violet Evergarden"]
+    },
+    {
+      "name": "Toei Animation",
+      "image": "images/Toei-Animation-black.webp",
+      "meta": "Founding Year: 1956; Era: 1980s",
+      "detail": "Pioneering studio with Dragon Ball, Dragon Ball Z, One Piece, and Sailor Moon. One of the most prolific studios in anime history.",
+      "related": ["Dragon Ball", "Dragon Ball Z", "Sailor Moon"]
+    },
+    {
+      "name": "Studio Ghibli",
+      "image": "images/Studio-Ghibli-black.webp",
+      "meta": "Founding Year: June 15, 1985; Era: 1980s",
+      "detail": "Founded by Hayao Miyazaki and Isao Takahata, created masterpieces like Spirited Away, Howl's Moving Castle, and My Neighbor Totoro.",
+      "related": ["Spirited Away", "Princess Mononoke"]
+    },
+    {
+      "name": "Bones",
+      "image": "images/Bones-logo.webp",
+      "meta": "Founding Year: 1998; Era: 2000s",
+      "detail": "Created Fullmetal Alchemist, Soul Eater, My Hero Academia, and Carole & Tuesday. Known for vibrant art style and dynamic action.",
+      "related": ["Fullmetal Alchemist", "My Hero Academia"]
+    },
+    {
+      "name": "ufotable",
+      "image": "images/ufotable-logo-black.webp",
+      "meta": "Founding Year: 2000; Era: 2010s",
+      "detail": "Produced the acclaimed Demon Slayer film and series with revolutionary animation techniques and stunning visual effects.",
+      "related": ["Demon Slayer"]
+    }
+  ],
+  "creators": [
+    {
+      "name": "Eiichiro Oda",
+      "image": "images/oda 1.png",
+      "role": "Role: Writer, Mangaka, Creator",
+      "affiliation": "Studio Affiliations: Professional mangaka affiliated with Shueisha.",
+      "detail": "Created One Piece, which began serialization in 1997 and has become the best-selling manga series in history.",
+      "related": ["One Piece"]
+    },
+    {
+      "name": "Hideaki Anno",
+      "image": "images/Hideaki Anno.webp",
+      "role": "Role: Director, Writer, Producer",
+      "affiliation": "Studio Affiliations: Founded Gainax, created Neon Genesis Evangelion.",
+      "detail": "Revolutionary director behind Neon Genesis Evangelion, known for psychological depth and experimental narrative techniques.",
+      "related": ["Neon Genesis Evangelion"]
+    },
+    {
+      "name": "Yoshihiro Togashi",
+      "image": "images/Yoshihiro_Togashi.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
+      "detail": "Creator of Yu Yu Hakusho and Hunter x Hunter, two of the most influential manga series in anime history.",
+      "related": ["Yu Yu Hakusho", "Hunter x Hunter"]
+    },
+    {
+      "name": "Hayao Miyazaki",
+      "image": "images/Hayao-Miyazaki.webp",
+      "role": "Role: Director, Producer, Writer",
+      "affiliation": "Studio Affiliations: Co-founder of Studio Ghibli.",
+      "detail": "Master filmmaker behind Spirited Away, Howl's Moving Castle, and Princess Mononoke. Multiple Academy Award winner.",
+      "related": ["Spirited Away", "Princess Mononoke"]
+    },
+    {
+      "name": "Kohei Horikoshi",
+      "image": "images/Kohei-Horikoshi.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
+      "detail": "Creator of My Hero Academia, one of the most popular modern manga and anime series worldwide.",
+      "related": ["My Hero Academia"]
+    },
+    {
+      "name": "Kunihiko Ikuhara",
+      "image": "images/kunihiko-ikuhara.jpeg",
+      "role": "Role: Director, Writer, Producer",
+      "affiliation": "Studio Affiliations: Directed for Toei Animation and independent projects.",
+      "detail": "Director of Sailor Moon and Utena, known for groundbreaking storytelling and visual symbolism.",
+      "related": ["Sailor Moon"]
+    },
+    {
+      "name": "Haruo Sotozaki",
+      "image": "images/Haruo-Sotozaki.webp",
+      "role": "Role: Director, Producer",
+      "affiliation": "Studio Affiliations: Director at ufotable.",
+      "detail": "Director of the Demon Slayer film and series, known for revolutionary animation techniques and visual innovation.",
+      "related": ["Demon Slayer"]
+    }
+  ]
+}

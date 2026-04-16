@@ -3,19 +3,29 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const ThemeContext = createContext(undefined);
 const THEME_STORAGE_KEY = "theme";
 
-const getPreferredTheme = () => {
+const readStoredTheme = () => {
     if (typeof window === "undefined") {
+        return null;
+    }
+
+    try {
+        const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+        return storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
+    } catch {
+        return null;
+    }
+};
+
+const getSystemTheme = () => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
         return "light";
     }
 
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    if (savedTheme === "dark" || savedTheme === "light") {
-        return savedTheme;
-    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
 
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+const getPreferredTheme = () => {
+    return readStoredTheme() ?? getSystemTheme();
 };
 
 export const ThemeProvider = ({ children }) => {
@@ -27,7 +37,12 @@ export const ThemeProvider = ({ children }) => {
         document.body.classList.toggle("theme-dark", isDark);
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-        window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+        try {
+            window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+        } catch {
+            // Ignore storage failures (for example in private browsing modes).
+        }
     }, [theme]);
 
     const value = useMemo(

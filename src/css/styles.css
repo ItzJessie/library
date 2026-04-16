@@ -327,20 +327,6 @@ body {
     --featured-tooltip-border: rgba(255, 255, 255, 0.2);
 
     /* All series page */
-    --all-series-bg: rgba(12, 10, 8, 0.95);
-    --all-series-bg-2: rgba(18, 14, 11, 0.98);
-    --all-series-line: rgba(255, 255, 255, 0.12);
-    --all-series-main-glow-1: rgba(255, 255, 255, 0.25);
-    --all-series-main-glow-2: rgba(255, 255, 255, 0.18);
-    --all-series-hero-text: #f9f3e8;
-    --all-series-card-bg: rgba(28, 22, 18, 0.95);
-    --all-series-card-border: rgba(255, 255, 255, 0.15);
-    --all-series-card-shadow: rgba(0, 0, 0, 0.55);
-    --all-series-card-text: #faf5f0;
-    --all-series-card-muted: rgba(250, 245, 240, 0.8);
-    --all-series-card-label: rgba(255, 250, 245, 0.95);
-
-    /* All series page */
     --all-series-bg: rgba(255, 247, 232, 0.75);
     --all-series-bg-2: rgba(232, 214, 186, 0.9);
     --all-series-line: rgba(90, 64, 38, 0.18);
@@ -523,6 +509,7 @@ body {
     --all-series-dark-shadow: rgba(0, 0, 0, 0.55);
     --all-series-dark-shadow-60: rgba(0, 0, 0, 0.6);
     --all-series-dark-shadow-50: rgba(0, 0, 0, 0.5);
+    --all-series-dark-bg: rgba(18, 13, 10, 0.95);
     --all-series-dark-text: #faf5f0;
     --all-series-dark-highlight: #fff4e8;
 }
@@ -5595,19 +5582,19 @@ body.theme-dark .all-series-page .close-button {
 }
 
 /* Dark mode adjustments for suggestions */
-body.dark-mode .search-suggestions {
+body.theme-dark .search-suggestions {
     background: var(--all-series-dark-bg, #1a1a1a);
     border-color: var(--white-18, rgba(255, 255, 255, 0.18));
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
-body.dark-mode .suggestion-item {
+body.theme-dark .suggestion-item {
     color: var(--all-series-dark-text, #e0e0e0);
     border-bottom-color: var(--white-08, rgba(255, 255, 255, 0.08));
 }
 
-body.dark-mode .suggestion-item:hover,
-body.dark-mode .suggestion-item.selected {
+body.theme-dark .suggestion-item:hover,
+body.theme-dark .suggestion-item.selected {
     background-color: var(--accent, #c17767);
     color: var(--cream-100, #faf5ef);
 }

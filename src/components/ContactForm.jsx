@@ -1,7 +1,16 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import "../css/ContactForm.css";
 
-const ACCESS_KEY = "d660fc80-b260-4e38-8254-cf6bfec2b117";
+const ACCESS_KEY =
+	process.env.REACT_APP_WEB3FORMS_ACCESS_KEY || "d660fc80-b260-4e38-8254-cf6bfec2b117";
+const getRedirectUrl = () => {
+	if (typeof window !== "undefined" && window.location?.href) {
+		return window.location.href;
+	}
+
+	return "";
+};
 
 const ContactForm = () => {
 	const [formData, setFormData] = useState({
@@ -60,6 +69,7 @@ const ContactForm = () => {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+		const formElement = event.currentTarget;
 		setStatus({ type: "", message: "" });
 
 		if (!validate()) {
@@ -91,7 +101,7 @@ const ContactForm = () => {
 				data = null;
 			}
 
-			if (response.ok) {
+			if (response.ok && data?.success !== false) {
 				setStatus({
 					type: "success",
 					message: data?.message || "Message sent successfully."
@@ -109,10 +119,21 @@ const ContactForm = () => {
 				});
 			}
 		} catch (error) {
-			setStatus({
-				type: "error",
-				message: "Unable to reach the form service. Please check your connection and try again."
-			});
+			// If fetch is blocked (often by strict privacy/CORS settings),
+			// fall back to a native form post that doesn't rely on fetch.
+			if (typeof formElement.submit === "function") {
+				setStatus({
+					type: "pending",
+					message: "Secure fallback submit in progress..."
+				});
+
+				formElement.submit();
+			} else {
+				setStatus({
+					type: "error",
+					message: "Unable to submit the form right now. Please try again shortly."
+				});
+			}
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -125,13 +146,22 @@ const ContactForm = () => {
 				Have questions or want to share your thoughts about Japanese animation? We would love to hear from you.
 			</p>
 
-			<form className="contact-form" onSubmit={handleSubmit} noValidate>
+			<form
+				className="contact-form"
+				onSubmit={handleSubmit}
+				action="https://api.web3forms.com/submit"
+				method="POST"
+				noValidate
+			>
+				<input type="hidden" name="access_key" value={ACCESS_KEY} />
+				<input type="hidden" name="redirect" value={getRedirectUrl()} />
 				<div className="form-group">
 					<label htmlFor="contactName">Name *</label>
 					<input
 						type="text"
 						id="contactName"
 						name="name"
+						autoComplete="name"
 						value={formData.name}
 						onChange={handleChange}
 						required
@@ -148,6 +178,7 @@ const ContactForm = () => {
 						type="email"
 						id="contactEmail"
 						name="email"
+						autoComplete="email"
 						value={formData.email}
 						onChange={handleChange}
 						required
@@ -164,6 +195,7 @@ const ContactForm = () => {
 						type="text"
 						id="contactSubject"
 						name="subject"
+						autoComplete="off"
 						value={formData.subject}
 						onChange={handleChange}
 						required
@@ -196,7 +228,12 @@ const ContactForm = () => {
 
 				{status.message ? (
 					<div className={`form-feedback ${status.type}`.trim()} role="status" aria-live="polite">
-						{status.message}
+						<p>{status.message}</p>
+						{status.type === "success" ? (
+							<p>
+								Want to share broader site feedback too? <Link to="/user-feedback">Open feedback page</Link>.
+							</p>
+						) : null}
 					</div>
 				) : null}
 			</form>

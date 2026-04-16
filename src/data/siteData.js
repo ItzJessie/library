@@ -12,26 +12,71 @@ export const eraPanels = [
             "High-budget, artistically ambitious films like Akira push the boundaries of animation",
             "Anime gains widespread, international audiences as it moves beyond Japan"
         ],
+        whyThisEraMatters: [
+            "Rise of global anime popularity introduced Japanese animation to mainstream audiences.",
+            "Breakthrough films like Akira changed perceptions of what animation could achieve.",
+            "Rapid genre expansion in mecha, cyberpunk, and shounen shaped modern anime DNA."
+        ],
+        eraRecommendations: [
+            {
+                title: "If you like Dragon Ball",
+                description: "Check out 1990s shounen evolution with bigger tournament arcs and ensemble casts.",
+                targetEraId: "1990s"
+            },
+            {
+                title: "If you love Akira",
+                description: "Jump to 1990s for darker psychological sci-fi like Evangelion and Bebop.",
+                targetEraId: "1990s"
+            }
+        ],
         influentialSeries: [
             {
                 year: 1982,
                 title: "Super Dimension Fortress Macross",
-                description: "A spacefaring mecha series that pioneered variable fighters and romantic drama."
+                description: "A spacefaring mecha series that pioneered variable fighters and romantic drama.",
+                image: "images/macross-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/uY4fme_AvW4",
+                    clipEmbed: "https://www.youtube.com/embed/SZnW0MdAlmo",
+                    trailerLabel: "Macross trailer",
+                    clipLabel: "Macross opening clip"
+                }
             },
             {
                 year: 1984,
                 title: "Dragon Ball",
-                description: "A shounen action-adventure that became a global phenomenon and defined the genre."
+                description: "A shounen action-adventure that became a global phenomenon and defined the genre.",
+                image: "images/dragon-ball-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/2P8bjRTeC3E",
+                    clipEmbed: "https://www.youtube.com/embed/FJqGirLjQn4",
+                    trailerLabel: "Dragon Ball trailer",
+                    clipLabel: "Dragon Ball opening clip"
+                }
             },
             {
                 year: 1987,
                 title: "Akira",
-                description: "A cyberpunk masterpiece that revolutionized anime animation and storytelling."
+                description: "A cyberpunk masterpiece that revolutionized anime animation and storytelling.",
+                image: "images/akira-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/nA8KmHC2Z-g",
+                    clipEmbed: "https://www.youtube.com/embed/05i9YMvn46M",
+                    trailerLabel: "Akira trailer",
+                    clipLabel: "Akira opening clip"
+                }
             },
             {
                 year: 1988,
                 title: "Gundam Wing",
-                description: "A mecha series featuring a complex political narrative and global appeal."
+                description: "A mecha series featuring a complex political narrative and global appeal.",
+                image: "images/gundam-wing-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/OW7GYCbu6Os",
+                    clipEmbed: "https://www.youtube.com/embed/yiRGBoFtv20",
+                    trailerLabel: "Gundam Wing trailer",
+                    clipLabel: "Gundam Wing opening clip"
+                }
             }
         ]
     },
@@ -48,26 +93,71 @@ export const eraPanels = [
             "The emergence of cyberpunk and noir-themed anime targeting adult audiences",
             "Home video releases and international distribution significantly expand anime's reach"
         ],
+        whyThisEraMatters: [
+            "Anime became a daily TV habit for global audiences, not just a niche import.",
+            "Genre-defining stories balanced blockbuster action with deeper emotional themes.",
+            "International distribution created the first truly global anime fan communities."
+        ],
+        eraRecommendations: [
+            {
+                title: "If you like Sailor Moon",
+                description: "Explore 2010s titles for modern takes on character-driven teams and emotional stakes.",
+                targetEraId: "2010s"
+            },
+            {
+                title: "If you love Evangelion",
+                description: "Jump to 2020s for dark, psychological action series with premium production values.",
+                targetEraId: "2020s"
+            }
+        ],
         influentialSeries: [
             {
                 year: 1992,
                 title: "Sailor Moon",
-                description: "A magical girl phenomenon that captured worldwide audiences and defined an era."
+                description: "A magical girl phenomenon that captured worldwide audiences and defined an era.",
+                image: "images/sailor-moon-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/5txHGxJRwtQ",
+                    clipEmbed: "https://www.youtube.com/embed/ABuoRG7VUv4",
+                    trailerLabel: "Sailor Moon trailer",
+                    clipLabel: "Sailor Moon opening clip"
+                }
             },
             {
                 year: 1994,
                 title: "Neon Genesis Evangelion",
-                description: "A groundbreaking mecha series known for psychological depth and complex narrative."
+                description: "A groundbreaking mecha series known for psychological depth and complex narrative.",
+                image: "images/neon-evangelion-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/13nSISwxrY4",
+                    clipEmbed: "https://www.youtube.com/embed/o6wtDPVkKqI",
+                    trailerLabel: "Evangelion trailer",
+                    clipLabel: "Evangelion opening clip"
+                }
             },
             {
                 year: 1995,
                 title: "Rurouni Kenshin",
-                description: "A historical shounen action series balancing comedy, action, and emotional depth."
+                description: "A historical shounen action series balancing comedy, action, and emotional depth.",
+                image: "images/rurouni-kenshin-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/V83Kxuvt9Jc",
+                    clipEmbed: "https://www.youtube.com/embed/YvvlGma6COM",
+                    trailerLabel: "Rurouni Kenshin trailer",
+                    clipLabel: "Rurouni Kenshin opening clip"
+                }
             },
             {
                 year: 1998,
                 title: "Cowboy Bebop",
-                description: "A space noir series that became iconic for its jazz-influenced aesthetic and storytelling."
+                description: "A space noir series that became iconic for its jazz-influenced aesthetic and storytelling.",
+                image: "images/cowboy-bebop-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/RI08P5SaJNU",
+                    clipEmbed: "https://www.youtube.com/embed/EL-D9LrFJd4",
+                    trailerLabel: "Cowboy Bebop trailer",
+                    clipLabel: "Cowboy Bebop intro clip"
+                }
             }
         ]
     },
@@ -84,26 +174,71 @@ export const eraPanels = [
             "International anime streaming platforms begin to emerge, expanding accessibility",
             "Anime conventions and fan communities solidify in Western countries"
         ],
+        whyThisEraMatters: [
+            "The 2000s turned anime from fan-sub culture into mainstream entertainment pipelines.",
+            "Long-running franchises set a new standard for global fandom and merchandising.",
+            "Digital workflows changed production speed, look, and action choreography."
+        ],
+        eraRecommendations: [
+            {
+                title: "If you like Naruto",
+                description: "Check out the 2010s for polished shounen successors like My Hero Academia.",
+                targetEraId: "2010s"
+            },
+            {
+                title: "If you liked Death Note",
+                description: "Try 2020s psychological thrillers with darker moral conflicts.",
+                targetEraId: "2020s"
+            }
+        ],
         influentialSeries: [
             {
                 year: 2000,
                 title: "Fullmetal Alchemist",
-                description: "An intricate fantasy series with complex mythology and strong character interactions."
+                description: "An intricate fantasy series with complex mythology and strong character interactions.",
+                image: "images/fullmetal-alchemist-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/2Dsa8j_usqI",
+                    clipEmbed: "https://www.youtube.com/embed/dE1fqsapSAc",
+                    trailerLabel: "Fullmetal Alchemist trailer",
+                    clipLabel: "Fullmetal Alchemist opening clip"
+                }
             },
             {
                 year: 2001,
                 title: "Bleach",
-                description: "A supernatural action series that captivated audiences with its visual style."
+                description: "A supernatural action series that captivated audiences with its visual style.",
+                image: "images/bleach-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/78WIYzX_m98",
+                    clipEmbed: "https://www.youtube.com/embed/1lsn2tT5yTc",
+                    trailerLabel: "Bleach trailer",
+                    clipLabel: "Bleach opening clip"
+                }
             },
             {
                 year: 2002,
                 title: "Naruto",
-                description: "A landmark shounen series that defined the 2000s with its compelling protagonist journey."
+                description: "A landmark shounen series that defined the 2000s with its compelling protagonist journey.",
+                image: "images/naruto-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/QczGoCmX-pI",
+                    clipEmbed: "https://www.youtube.com/embed/4t__wczfpRI",
+                    trailerLabel: "Naruto trailer",
+                    clipLabel: "Naruto opening clip"
+                }
             },
             {
                 year: 2005,
                 title: "Death Note",
-                description: "A psychological thriller that captured international audiences with its unique premise."
+                description: "A psychological thriller that captured international audiences with its unique premise.",
+                image: "images/death-note-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/NlJZ-YgAt-c",
+                    clipEmbed: "https://www.youtube.com/embed/oG7EaSELOiM",
+                    trailerLabel: "Death Note trailer",
+                    clipLabel: "Death Note opening clip"
+                }
             }
         ]
     },
@@ -120,26 +255,71 @@ export const eraPanels = [
             "The rise of both indie anime and massive studio productions with cinematic quality",
             "Anime becomes a mainstream medium recognized at international film festivals"
         ],
+        whyThisEraMatters: [
+            "Streaming made simulcasts the default, shrinking the gap between Japan and global audiences.",
+            "Production quality benchmarks rose dramatically across TV and film-format releases.",
+            "Anime storytelling broadened into prestige drama, experimental sci-fi, and new comedy formats."
+        ],
+        eraRecommendations: [
+            {
+                title: "If you like Attack on Titan",
+                description: "Try the 2020s for intense dark fantasy with even higher production ambition.",
+                targetEraId: "2020s"
+            },
+            {
+                title: "If you like Steins;Gate",
+                description: "Revisit the 1990s to see the psychological roots that inspired modern sci-fi anime.",
+                targetEraId: "1990s"
+            }
+        ],
         influentialSeries: [
             {
                 year: 2010,
                 title: "Steins;Gate",
-                description: "A sci-fi time-travel thriller praised for complex plotting and character development."
+                description: "A sci-fi time-travel thriller praised for complex plotting and character development.",
+                image: "images/steins-gate-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/uMYhjVwp0Fk",
+                    clipEmbed: "https://www.youtube.com/embed/ZGM90Bo3zH0",
+                    trailerLabel: "Steins;Gate trailer",
+                    clipLabel: "Steins;Gate opening clip"
+                }
             },
             {
                 year: 2011,
                 title: "Attack on Titan",
-                description: "An action-packed thriller that became a global phenomenon with stunning visuals."
+                description: "An action-packed thriller that became a global phenomenon with stunning visuals.",
+                image: "images/attack-on-titan-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/MGRm4IzK1SQ",
+                    clipEmbed: "https://www.youtube.com/embed/8OkpRK2_gVs",
+                    trailerLabel: "Attack on Titan trailer",
+                    clipLabel: "Attack on Titan opening clip"
+                }
             },
             {
                 year: 2016,
                 title: "My Hero Academia",
-                description: "A superhero series that defined the late 2010s with engaging characters and narrative."
+                description: "A superhero series that defined the late 2010s with engaging characters and narrative.",
+                image: "images/hero-academia-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/EPVkcwyLQQ8",
+                    clipEmbed: "https://www.youtube.com/embed/L1FdEBTJXus",
+                    trailerLabel: "My Hero Academia trailer",
+                    clipLabel: "My Hero Academia opening clip"
+                }
             },
             {
                 year: 2015,
                 title: "One Punch Man",
-                description: "A unique take on the superhero genre with stunning animation and clever humor."
+                description: "A unique take on the superhero genre with stunning animation and clever humor.",
+                image: "images/one-punch-man-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/Poo5lqoWSGw",
+                    clipEmbed: "https://www.youtube.com/embed/atxYe-nOa9w",
+                    trailerLabel: "One Punch Man trailer",
+                    clipLabel: "One Punch Man opening clip"
+                }
             }
         ]
     },
@@ -156,139 +336,73 @@ export const eraPanels = [
             "Anime continues to push boundaries with mature themes and complex narratives",
             "International collaborations and co-productions become increasingly common"
         ],
+        whyThisEraMatters: [
+            "Anime now launches globally in near real-time, shaping international pop culture weekly.",
+            "Studios combine cinematic visuals with TV pacing, raising audience expectations.",
+            "Cross-border collaborations are redefining what counts as anime storytelling."
+        ],
+        eraRecommendations: [
+            {
+                title: "If you like Chainsaw Man",
+                description: "Dive back into the 1990s to see early noir and psychological influences.",
+                targetEraId: "1990s"
+            },
+            {
+                title: "If you like Jujutsu Kaisen",
+                description: "Explore 2000s foundations in battle-shounen structure and worldbuilding.",
+                targetEraId: "2000s"
+            }
+        ],
         influentialSeries: [
             {
                 year: 2020,
                 title: "Jujutsu Kaisen",
-                description: "A dark fantasy action series with exceptional animation and engaging mythology."
+                description: "A dark fantasy action series with exceptional animation and engaging mythology.",
+                image: "images/jujutsu-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/4A_X-Dvl0ws",
+                    clipEmbed: "https://www.youtube.com/embed/GwaRztMaoY0",
+                    trailerLabel: "Jujutsu Kaisen trailer",
+                    clipLabel: "Jujutsu Kaisen opening clip"
+                }
             },
             {
                 year: 2020,
                 title: "Tower of God",
-                description: "A Korean webtoon adaptation that represents the rise of international anime collaborations."
+                description: "A Korean webtoon adaptation that represents the rise of international anime collaborations.",
+                image: "images/tower-of-god-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/RNyClma6awo",
+                    clipEmbed: "https://www.youtube.com/embed/apII5VFTce0",
+                    trailerLabel: "Tower of God trailer",
+                    clipLabel: "Tower of God opening clip"
+                }
             },
             {
                 year: 2022,
                 title: "Chainsaw Man",
-                description: "A gritty dark fantasy series with innovative animation techniques and mature storytelling."
+                description: "A gritty dark fantasy series with innovative animation techniques and mature storytelling.",
+                image: "images/chainsaw-man-poster.webp",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/v4yLeNt-kCU",
+                    clipEmbed: "https://www.youtube.com/embed/HEwAiwttN10",
+                    trailerLabel: "Chainsaw Man trailer",
+                    clipLabel: "Chainsaw Man opening clip"
+                }
             },
             {
                 year: 2022,
                 title: "Cyberpunk: Edgerunners",
-                description: "A Netflix original that blends cyberpunk aesthetics with emotional storytelling."
+                description: "A Netflix original that blends cyberpunk aesthetics with emotional storytelling.",
+                image: "images/cyberpunk-poster.jpeg",
+                media: {
+                    trailerEmbed: "https://www.youtube.com/embed/JtqIas3bYhg",
+                    clipEmbed: "https://www.youtube.com/embed/OifiVCnFKzM",
+                    trailerLabel: "Cyberpunk: Edgerunners trailer",
+                    clipLabel: "Cyberpunk: Edgerunners opening clip"
+                }
             }
         ]
-    }
-];
-
-export const studios = [
-    {
-        name: "Wit Studio, Inc",
-        image: "images/wit-studio-one-piece-remake-pros-and-cons-featured 1.png",
-        meta: "Founding Year: June 1, 2012; Era: 2010s",
-        detail: "Wit Studio is the Japanese animation studio responsible for producing the first three seasons of Attack on Titan, known for high-quality visuals and dynamic action sequences.",
-        related: ["Attack on Titan", "Vinland Saga"]
-    },
-    {
-        name: "MAPPA",
-        image: "images/mappa-logo.webp",
-        meta: "Founding Year: June 2011; Era: 2010s",
-        detail: "MAPPA produced popular series including Jujutsu Kaisen, Kabaneri of the Iron Fortress, and continued Attack on Titan's final seasons with acclaimed animation quality.",
-        related: ["Chainsaw Man"]
-    },
-    {
-        name: "Kyoto Animation",
-        image: "images/kyoto-animation-logo.webp",
-        meta: "Founding Year: 1981; Era: 2000s",
-        detail: "Known for The Melancholy of Haruhi Suzumiya, K-On!, and Silent Voice, Kyoto Animation is celebrated for exceptional art direction and character animation.",
-        related: ["Violet Evergarden"]
-    },
-    {
-        name: "Toei Animation",
-        image: "images/Toei-Animation-black.webp",
-        meta: "Founding Year: 1956; Era: 1980s",
-        detail: "Pioneering studio with Dragon Ball, Dragon Ball Z, One Piece, and Sailor Moon. One of the most prolific studios in anime history.",
-        related: ["Dragon Ball", "Dragon Ball Z", "Sailor Moon"]
-    },
-    {
-        name: "Studio Ghibli",
-        image: "images/Studio-Ghibli-black.webp",
-        meta: "Founding Year: June 15, 1985; Era: 1980s",
-        detail: "Founded by Hayao Miyazaki and Isao Takahata, created masterpieces like Spirited Away, Howl's Moving Castle, and My Neighbor Totoro.",
-        related: ["Spirited Away", "Princess Mononoke"]
-    },
-    {
-        name: "Bones",
-        image: "images/Bones-logo.webp",
-        meta: "Founding Year: 1998; Era: 2000s",
-        detail: "Created Fullmetal Alchemist, Soul Eater, My Hero Academia, and Carole & Tuesday. Known for vibrant art style and dynamic action.",
-        related: ["Fullmetal Alchemist", "My Hero Academia"]
-    },
-    {
-        name: "ufotable",
-        image: "images/ufotable-logo-black.webp",
-        meta: "Founding Year: 2000; Era: 2010s",
-        detail: "Produced the acclaimed Demon Slayer film and series with revolutionary animation techniques and stunning visual effects.",
-        related: ["Demon Slayer"]
-    }
-];
-
-export const creators = [
-    {
-        name: "Eiichiro Oda",
-        image: "images/oda 1.png",
-        role: "Role: Writer, Mangaka, Creator",
-        affiliation: "Studio Affiliations: Professional mangaka affiliated with Shueisha.",
-        detail: "Created One Piece, which began serialization in 1997 and has become the best-selling manga series in history.",
-        related: ["One Piece"]
-    },
-    {
-        name: "Hideaki Anno",
-        image: "images/Hideaki Anno.webp",
-        role: "Role: Director, Writer, Producer",
-        affiliation: "Studio Affiliations: Founded Gainax, created Neon Genesis Evangelion.",
-        detail: "Revolutionary director behind Neon Genesis Evangelion, known for psychological depth and experimental narrative techniques.",
-        related: ["Neon Genesis Evangelion"]
-    },
-    {
-        name: "Yoshihiro Togashi",
-        image: "images/Yoshihiro_Togashi.webp",
-        role: "Role: Writer, Mangaka",
-        affiliation: "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
-        detail: "Creator of Yu Yu Hakusho and Hunter x Hunter, two of the most influential manga series in anime history.",
-        related: ["Yu Yu Hakusho", "Hunter x Hunter"]
-    },
-    {
-        name: "Hayao Miyazaki",
-        image: "images/Hayao-Miyazaki.webp",
-        role: "Role: Director, Producer, Writer",
-        affiliation: "Studio Affiliations: Co-founder of Studio Ghibli.",
-        detail: "Master filmmaker behind Spirited Away, Howl's Moving Castle, and Princess Mononoke. Multiple Academy Award winner.",
-        related: ["Spirited Away", "Princess Mononoke"]
-    },
-    {
-        name: "Kohei Horikoshi",
-        image: "images/Kohei-Horikoshi.webp",
-        role: "Role: Writer, Mangaka",
-        affiliation: "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
-        detail: "Creator of My Hero Academia, one of the most popular modern manga and anime series worldwide.",
-        related: ["My Hero Academia"]
-    },
-    {
-        name: "Kunihiko Ikuhara",
-        image: "images/kunihiko-ikuhara.jpeg",
-        role: "Role: Director, Writer, Producer",
-        affiliation: "Studio Affiliations: Directed for Toei Animation and independent projects.",
-        detail: "Director of Sailor Moon and Utena, known for groundbreaking storytelling and visual symbolism.",
-        related: ["Sailor Moon"]
-    },
-    {
-        name: "Haruo Sotozaki",
-        image: "images/Haruo-Sotozaki.webp",
-        role: "Role: Director, Producer",
-        affiliation: "Studio Affiliations: Director at ufotable.",
-        detail: "Director of the Demon Slayer film and series, known for revolutionary animation techniques and visual innovation.",
-        related: ["Demon Slayer"]
     }
 ];
 
@@ -404,15 +518,6 @@ export const archiveSeries = [
         studio: "Wit Studio",
         genre: "Historical, action",
         synopsis: "A young warrior searches for meaning amid a brutal Viking world."
-    },
-    {
-        id: "series-psycho-pass",
-        title: "Psycho Pass",
-        image: "images/psychopass-400x300.jpg",
-        year: 2012,
-        studio: "Production I.G",
-        genre: "Sci-fi, crime",
-        synopsis: "Inspectors police a future where minds are scanned for criminal intent."
     }
 ];
 

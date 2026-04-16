@@ -965,6 +965,7 @@
     line-height: 1.65;
     color: var(--all-series-card-muted);
     display: -webkit-box;
+    line-clamp: 4;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;

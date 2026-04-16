@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import "../css/Header.css";
 import Navigation from "./Navigation";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ onOpenSearch = () => {} }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const closeOnResize = () => {
-            if (window.innerWidth > 720) {
+            if (window.innerWidth > 1167) {
                 setMenuOpen(false);
             }
         };
@@ -16,6 +17,25 @@ const Header = () => {
         window.addEventListener("resize", closeOnResize);
         return () => window.removeEventListener("resize", closeOnResize);
     }, []);
+
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if (!menuOpen) {
+            return undefined;
+        }
+
+        const closeOnEscape = (event) => {
+            if (event.key === "Escape") {
+                setMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("keydown", closeOnEscape);
+        return () => document.removeEventListener("keydown", closeOnEscape);
+    }, [menuOpen]);
 
     const closeMenu = () => setMenuOpen(false);
 
@@ -34,6 +54,7 @@ const Header = () => {
                     className="brand"
                     to="/"
                     aria-label="Japanese Animation History Archive home"
+                    onClick={closeMenu}
                 >
                     <img
                         className="brand-logo"
@@ -57,7 +78,7 @@ const Header = () => {
                     <span aria-hidden="true">{menuOpen ? "\u2715" : "\u2630"}</span>
                 </button>
                 <div id="primary-nav">
-                    <Navigation onNavigate={closeMenu} />
+                    <Navigation onNavigate={closeMenu} onOpenSearch={onOpenSearch} />
                 </div>
             </div>
         </header>

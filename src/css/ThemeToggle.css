@@ -43,6 +43,11 @@ body:not(.theme-dark) .global-theme-toggle {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
 }
 
+.global-theme-toggle:active {
+    transform: translateY(0px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .global-theme-toggle:focus-visible {
     outline: 2px solid #f4d9a6;
     outline-offset: 2px;
@@ -51,6 +56,7 @@ body:not(.theme-dark) .global-theme-toggle {
 .global-theme-toggle__label {
     min-width: 4ch;
     text-align: right;
+    transition: color 0.2s ease;
 }
 
 .global-theme-toggle__track {
@@ -104,6 +110,18 @@ body:not(.theme-dark) .global-theme-toggle:hover {
 
 body:not(.theme-dark) .global-theme-toggle:focus-visible {
     outline-color: #6d4423;
+}
+
+body:not(.theme-dark) .global-theme-toggle:active {
+    box-shadow: 0 4px 10px rgba(65, 45, 28, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .global-theme-toggle,
+    .global-theme-toggle__label,
+    .global-theme-toggle__thumb {
+        transition: none;
+    }
 }
 
 @media (max-width: 720px) {

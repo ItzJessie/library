@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import "../css/Slideshow.css";
 
 const INTERVAL_MS = 5000;
@@ -79,7 +80,8 @@ const Slideshow = ({ slides }) => {
         }
 
         const timer = window.setInterval(() => {
-            setSlideIndex((prev) => (prev + 1) % items.length);
+            setIsTransitioning(true);
+            setSlideIndex((prev) => prev + 1);
         }, INTERVAL_MS);
 
         return () => window.clearInterval(timer);
@@ -101,6 +103,15 @@ const Slideshow = ({ slides }) => {
 
         setIsTransitioning(true);
         setSlideIndex((prev) => prev + 1);
+    };
+
+    const handleDotSelect = (targetIndex) => {
+        if (isTransitioning || items.length <= 1) {
+            return;
+        }
+
+        setIsTransitioning(true);
+        setSlideIndex(hasLoop ? targetIndex + 1 : targetIndex);
     };
 
     const handleKeyDown = (event) => {
@@ -162,6 +173,18 @@ const Slideshow = ({ slides }) => {
         setIsPaused(false);
     };
 
+    const handleShellFocus = () => {
+        setIsPaused(true);
+    };
+
+    const handleShellBlur = (event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) {
+            return;
+        }
+
+        setIsPaused(false);
+    };
+
     const handleTrackTransitionEnd = () => {
         if (!hasLoop) {
             setIsTransitioning(false);
@@ -208,8 +231,8 @@ const Slideshow = ({ slides }) => {
             className={`carousel-shell ${isPaused ? "" : "is-animating"}`.trim()}
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
-            onFocus={() => setIsPaused(true)}
-            onBlur={() => setIsPaused(false)}
+            onFocus={handleShellFocus}
+            onBlur={handleShellBlur}
             onKeyDown={handleKeyDown}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -218,10 +241,6 @@ const Slideshow = ({ slides }) => {
             tabIndex={0}
             aria-label="Featured influential anime slideshow"
         >
-            <div className="carousel-progress" aria-hidden="true">
-                <span className="carousel-progress__bar" key={`${slideIndex}-${isPaused}`}></span>
-            </div>
-
             <button
                 className="carousel-arrow"
                 aria-label={`Previous slide. Currently showing ${currentLabel}`}
@@ -240,10 +259,50 @@ const Slideshow = ({ slides }) => {
             >
                 {displayedSlides.map((series, index) => (
                     <article className="carousel-card tilt-card" data-series-id={series.id} key={`${series.id}-${index}`}>
-                        <img src={series.image} alt={series.title} />
-                        <span>{series.title}</span>
+                        <img src={series.image} alt={series.title} loading="lazy" decoding="async" />
+                        <div className="carousel-card__shade" aria-hidden="true"></div>
+                        <div className="carousel-card__content">
+                            <h2>{series.title}</h2>
+                            <p className="carousel-card__meta">
+                                {series.year} <span aria-hidden="true">|</span> {series.genre}
+                            </p>
+                            <p className="carousel-card__summary">
+                                {series.synopsis || `A defining anime from ${series.studio} that reshaped modern fandom.`}
+                            </p>
+                            <Link
+                                className="carousel-card__cta"
+                                to={`/all-influential-series#${encodeURIComponent(series.id)}`}
+                            >
+                                View Details
+                            </Link>
+                        </div>
                     </article>
                 ))}
+            </div>
+
+            <div className="carousel-dots" role="tablist" aria-label="Select featured anime slide">
+                {items.map((series, index) => {
+                    const isActive = visibleIndex === index;
+                    return (
+                        <button
+                            key={series.id}
+                            type="button"
+                            className={`carousel-dot ${isActive ? "is-active" : ""}`.trim()}
+                            onClick={() => handleDotSelect(index)}
+                            aria-label={`Show ${series.title}`}
+                            aria-selected={isActive}
+                            role="tab"
+                        >
+                            {isActive && (
+                                <span
+                                    aria-hidden="true"
+                                    className="carousel-dot__progress"
+                                    key={`${visibleIndex}-${isPaused ? "paused" : "running"}`}
+                                ></span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             <button

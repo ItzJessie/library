@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 const Footer = () => {
 	return (
-		<footer className="site-footer">
+		<footer className="site-footer" aria-label="Site footer">
 			<div className="footer-inner">
 				<div className="footer-copy">
 					<p>The Japanese Animation History Archive</p>
@@ -17,11 +17,11 @@ const Footer = () => {
 				<div className="footer-links">
 					<small>&copy; Japanese Animation History Archive</small>
 					<div className="footer-actions">
-						<div className="footer-nav">
+						<nav className="footer-nav" aria-label="Footer navigation">
 							<Link to="/about">About</Link>
 							<span>|</span>
-							<Link to="/about">References</Link>
-						</div>
+							<Link to="/about#references">References</Link>
+						</nav>
 						<ThemeToggle />
 					</div>
 				</div>

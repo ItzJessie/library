@@ -71,6 +71,7 @@ body.theme-dark .series-carousel {
 .series-carousel .carousel-shell {
     --carousel-gap: 24px;
     position: relative;
+    isolation: isolate;
     overflow: hidden;
     border-radius: 26px;
     padding: 14px;
@@ -107,6 +108,7 @@ body.theme-dark .series-carousel {
 .series-carousel .carousel-shell:focus-visible {
     box-shadow:
         0 0 0 3px rgba(255, 255, 255, 0.45),
+        0 0 0 7px rgba(255, 255, 255, 0.35),
         0 0 0 7px color-mix(in srgb, var(--carousel-focus) 50%, transparent),
         0 20px 50px var(--carousel-shell-shadow);
 }
@@ -117,6 +119,7 @@ body.theme-dark .series-carousel {
     gap: var(--carousel-gap);
     position: relative;
     z-index: 2;
+    will-change: transform;
     transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -130,6 +133,7 @@ body.theme-dark .series-carousel {
     min-height: clamp(230px, 43vw, 360px);
     border-radius: 20px;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.28);
     border: 1px solid
         color-mix(in srgb, var(--carousel-shell-highlight) 70%, transparent);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -242,6 +246,7 @@ body.theme-dark .series-carousel {
     width: 44px;
     height: 44px;
     border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.34);
     border: 1px solid
         color-mix(in srgb, var(--carousel-shell-highlight) 85%, transparent);
     background: var(--carousel-arrow-bg);
@@ -260,6 +265,10 @@ body.theme-dark .series-carousel {
     transition:
         transform 0.2s ease,
         background-color 0.2s ease;
+}
+
+.series-carousel .carousel-arrow:active {
+    transform: translateY(-50%) scale(0.98);
 }
 
 .series-carousel .carousel-arrow:hover {
@@ -334,6 +343,7 @@ body.theme-dark .series-carousel {
 
 .series-carousel .carousel-dot:hover {
     transform: scale(1.08);
+    background: rgba(255, 255, 255, 0.42);
     background: color-mix(in srgb, var(--carousel-dot-fill) 75%, transparent);
 }
 
@@ -352,6 +362,26 @@ body.theme-dark .series-carousel {
 .series-carousel .carousel-card__cta:focus-visible {
     outline: 2px solid var(--carousel-focus);
     outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .series-carousel .carousel-track,
+    .series-carousel .carousel-card__cta,
+    .series-carousel .carousel-arrow,
+    .series-carousel .carousel-dot {
+        transition: none;
+    }
+
+    .series-carousel .carousel-dot__progress {
+        animation: none;
+        transform: scaleX(1);
+    }
+
+    .series-carousel .carousel-shell,
+    .series-carousel .carousel-card,
+    .series-carousel .carousel-card img {
+        scroll-behavior: auto;
+    }
 }
 
 .series-carousel .carousel-progress {
@@ -381,6 +411,7 @@ body.theme-dark .series-carousel {
         padding: 10px;
         border-radius: 20px;
         min-height: 220px;
+        touch-action: pan-y;
     }
 
     .series-carousel .carousel-card {

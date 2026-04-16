@@ -314,6 +314,7 @@ body.theme-dark .video-wrapper {
     color: inherit;
     padding: 0.8rem;
     min-height: 148px;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -399,6 +400,34 @@ body.theme-dark .home-quick-jump-cta {
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .home-click-card,
+    .home-search-result-card,
+    .home-quick-jump-tile,
+    .timeline-chip,
+    .home-card-arrow {
+        transition: none;
+    }
+
+    .home-click-card:hover,
+    .home-click-card:focus-within,
+    .home-search-result-card:hover,
+    .home-search-result-card:focus-visible,
+    .home-quick-jump-tile:hover,
+    .home-quick-jump-tile:focus-visible,
+    .timeline-chip:hover,
+    .timeline-chip:focus-visible,
+    .home-click-card:hover .home-card-arrow,
+    .home-click-card:focus-within .home-card-arrow,
+    .home-click-card-link:focus-visible .home-card-arrow,
+    .home-quick-jump-tile:hover .home-card-arrow,
+    .home-quick-jump-tile:focus-visible .home-card-arrow,
+    .timeline-chip:hover .home-card-arrow,
+    .timeline-chip:focus-visible .home-card-arrow {
+        transform: none;
+    }
+}
+
 @media (max-width: 900px) {
     .video-section {
         padding: 1.45rem;
@@ -420,5 +449,9 @@ body.theme-dark .home-quick-jump-cta {
 
     .home-quick-jump-grid {
         grid-template-columns: 1fr;
+    }
+
+    .home-quick-jump-tile {
+        min-height: 132px;
     }
 }
