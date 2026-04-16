@@ -120,30 +120,27 @@ describe("UniversalSearchOverlay component", () => {
     });
 
     test("supports suggestion keyboard selection", async () => {
-        const user = userEvent.setup();
-
         render(<UniversalSearchOverlay isOpen={true} onClose={jest.fn()} />);
 
         const input = screen.getByRole("searchbox", { name: /universal search/i });
-        await user.type(input, "spir");
+        await userEvent.type(input, "spir");
 
         const suggestionList = screen.getByRole("listbox", {
             name: /predictive suggestions/i
         });
         expect(within(suggestionList).getByText("Spirited Away")).toBeInTheDocument();
 
-        await user.keyboard("{ArrowDown}{Enter}");
+        await userEvent.keyboard("{ArrowDown}{Enter}");
 
         expect(input).toHaveValue("Spirited Away");
     });
 
     test("closes on escape", async () => {
-        const user = userEvent.setup();
         const onClose = jest.fn();
 
         render(<UniversalSearchOverlay isOpen={true} onClose={onClose} />);
 
-        await user.keyboard("{Escape}");
+        await userEvent.keyboard("{Escape}");
 
         expect(onClose).toHaveBeenCalledTimes(1);
     });

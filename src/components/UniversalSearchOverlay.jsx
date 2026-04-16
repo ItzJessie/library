@@ -55,7 +55,9 @@ const UniversalSearchOverlay = ({ isOpen, onClose, onPreviewUpdate }) => {
             if (inputRef.current) {
                 inputRef.current.focus();
                 // Scroll input into view for mobile keyboards
-                inputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+                if (typeof inputRef.current.scrollIntoView === "function") {
+                    inputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
             }
         });
     }, [isOpen]);
