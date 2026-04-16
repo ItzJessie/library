@@ -48,6 +48,7 @@ html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     scroll-behavior: smooth;
+    scroll-padding-top: 96px;
     scrollbar-gutter: stable;
     overflow-y: scroll;
 }
@@ -136,6 +137,19 @@ body {
     /* Navigation */
     --nav-link: #f2ece5;
     --nav-underline: #e6d6bf;
+    --nav-toggle-bg-start: rgba(248, 239, 227, 0.96);
+    --nav-toggle-bg-end: rgba(232, 214, 186, 0.96);
+    --nav-toggle-border: rgba(90, 64, 42, 0.18);
+    --nav-toggle-shadow: rgba(65, 45, 28, 0.18);
+    --nav-panel-bg: rgba(252, 247, 240, 0.92);
+    --nav-panel-border: rgba(90, 64, 42, 0.14);
+    --nav-panel-shadow: rgba(65, 45, 28, 0.18);
+    --nav-item-bg: rgba(255, 255, 255, 0.7);
+    --nav-item-border: rgba(90, 64, 42, 0.14);
+    --nav-item-hover-bg: rgba(210, 173, 107, 0.18);
+    --nav-item-active-bg: rgba(109, 68, 35, 0.12);
+    --nav-item-active-border: rgba(109, 68, 35, 0.22);
+    --nav-item-text: #2d1f16;
 
     /* Hero section */
     --hero-bg-1: rgba(244, 229, 203, 0.6);
@@ -551,6 +565,19 @@ body.theme-dark {
 
     --nav-link: #f1e5d6;
     --nav-underline: #caa067;
+    --nav-toggle-bg-start: rgba(44, 33, 25, 0.96);
+    --nav-toggle-bg-end: rgba(22, 16, 12, 0.96);
+    --nav-toggle-border: rgba(255, 255, 255, 0.1);
+    --nav-toggle-shadow: rgba(0, 0, 0, 0.45);
+    --nav-panel-bg: rgba(28, 22, 17, 0.92);
+    --nav-panel-border: rgba(255, 255, 255, 0.12);
+    --nav-panel-shadow: rgba(0, 0, 0, 0.45);
+    --nav-item-bg: rgba(255, 255, 255, 0.06);
+    --nav-item-border: rgba(255, 255, 255, 0.12);
+    --nav-item-hover-bg: rgba(210, 173, 107, 0.14);
+    --nav-item-active-bg: rgba(210, 173, 107, 0.16);
+    --nav-item-active-border: rgba(210, 173, 107, 0.24);
+    --nav-item-text: #f4eadf;
 
     --hero-bg-1: rgba(60, 46, 34, 0.65);
     --hero-bg-2: rgba(40, 30, 22, 0.5);
@@ -709,7 +736,7 @@ img {
     max-width: 100%;
     height: auto;
     display: block;
-    touch-action: none;
+    touch-action: manipulation;
 }
 
 a {
@@ -1080,6 +1107,103 @@ select {
 .main-nav a:hover {
     transform: translateY(-1px);
     text-shadow: 0 8px 18px var(--black-25);
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .tilt-card {
+        transform: none;
+    }
+
+    .tilt-card:hover,
+    .era-card:hover img,
+    .archive-card:hover img,
+    .timeline-card:hover .timeline-illustration,
+    .main-nav a:hover,
+    .timeline-card button:hover::after,
+    .timeline-button:hover::after {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .main-nav a,
+    .nav-toggle,
+    .timeline-card button,
+    .timeline-button,
+    .learn-more-btn,
+    .explore-era-btn,
+    .decade-close,
+    .submit-button,
+    .feedback-submit,
+    .filter-toggle,
+    .filter-menu button,
+    .clear-filters-btn,
+    .mobile-filter-toggle,
+    .card-action-btn,
+    .theme-toggle,
+    .gallery-card,
+    .era-card,
+    .archive-card,
+    .series-card,
+    .all-series-card,
+    .carousel-card,
+    .info-card {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .main-nav a:active,
+    .nav-toggle:active,
+    .timeline-card button:active,
+    .timeline-button:active,
+    .learn-more-btn:active,
+    .explore-era-btn:active,
+    .decade-close:active,
+    .submit-button:active,
+    .feedback-submit:active,
+    .filter-toggle:active,
+    .filter-menu button:active,
+    .clear-filters-btn:active,
+    .mobile-filter-toggle:active,
+    .card-action-btn:active,
+    .theme-toggle:active,
+    .gallery-card:active,
+    .era-card:active,
+    .archive-card:active,
+    .series-card:active,
+    .all-series-card:active,
+    .carousel-card:active,
+    .info-card:active {
+        transform: translateY(1px) scale(0.99);
+    }
+
+    .series-card:hover .series-info,
+    .series-card:hover span,
+    .series-card:focus-within .series-info,
+    .series-card:focus-within span,
+    .all-series-card:hover,
+    .all-series-card:focus-visible,
+    .gallery-card:hover,
+    .gallery-card:focus-visible,
+    .era-panel:hover,
+    .era-panel:focus-within,
+    .info-card:hover,
+    .info-card:focus-within {
+        transform: none;
+    }
+
+    .site-header.has-nav-toggle .main-nav a:hover,
+    .filter-menu button:hover,
+    .clear-filters-btn:hover,
+    .filter-toggle:hover,
+    .card-action-btn:hover,
+    .timeline-card button:hover,
+    .timeline-button:hover,
+    .learn-more-btn:hover,
+    .decade-close:hover,
+    .submit-button:hover,
+    .feedback-submit:hover,
+    .theme-toggle:hover {
+        transform: none;
+    }
 }
 
 .timeline-card button,
@@ -5737,10 +5861,10 @@ body.dark-mode .suggestion-item.selected {
     height: 320px;
     object-fit: cover;
     border-radius: 10px;
-    filter: sepia(0.4) saturate(0.9) contrast(1.05) brightness(0.95);
+    filter: none;
     background: transparent;
-    opacity: 0.72;
-    mix-blend-mode: multiply;
+    opacity: 1;
+    mix-blend-mode: normal;
     box-shadow: 0 18px 28px var(--series-figure-shadow);
 }
 
@@ -6125,7 +6249,28 @@ body.dark-mode .suggestion-item.selected {
     /* Footer adjustments */
     .site-footer {
         padding: 20px 0;
-        background-image: url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.55),
+                rgba(31, 27, 26, 0.55)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        overflow: visible;
+    }
+
+    body.theme-dark .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.65),
+                rgba(15, 12, 10, 0.65)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -6165,6 +6310,48 @@ body.dark-mode .suggestion-item.selected {
         align-items: center;
         justify-content: center;
         text-align: center;
+        position: relative;
+        padding: 24px 16px;
+        margin-left: -100vw;
+        margin-right: -100vw;
+        padding-left: calc(16px + 100vw);
+        padding-right: calc(16px + 100vw);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.65),
+                rgba(31, 27, 26, 0.65)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.06),
+                rgba(90, 70, 50, 0.06) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .footer-links::before {
+        display: none;
+    }
+
+    body.theme-dark .footer-links {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.75),
+                rgba(15, 12, 10, 0.75)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.08),
+                rgba(90, 70, 50, 0.08) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.4);
     }
 
     .footer-links small {
@@ -6213,6 +6400,80 @@ body.dark-mode .suggestion-item.selected {
 
 /* Small mobile devices (680px) */
 @media (max-width: 680px) {
+    .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.55),
+                rgba(31, 27, 26, 0.55)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        overflow: visible;
+    }
+
+    body.theme-dark .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.65),
+                rgba(15, 12, 10, 0.65)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .footer-links {
+        position: relative;
+        padding: 24px 16px;
+        margin-left: -100vw;
+        margin-right: -100vw;
+        padding-left: calc(16px + 100vw);
+        padding-right: calc(16px + 100vw);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.65),
+                rgba(31, 27, 26, 0.65)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.06),
+                rgba(90, 70, 50, 0.06) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .footer-links::before {
+        display: none;
+    }
+
+    body.theme-dark .footer-links {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.75),
+                rgba(15, 12, 10, 0.75)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.08),
+                rgba(90, 70, 50, 0.08) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.4);
+    }
+
     .footer-links a {
         font-size: 13px;
     }
@@ -6318,6 +6579,34 @@ body.dark-mode .suggestion-item.selected {
         font-size: 15px;
     }
 
+    .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.55),
+                rgba(31, 27, 26, 0.55)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    body.theme-dark .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.65),
+                rgba(15, 12, 10, 0.65)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
     .header-inner {
         padding: 10px 12px;
         gap: 10px;
@@ -6337,14 +6626,14 @@ body.dark-mode .suggestion-item.selected {
         font-size: 15px;
     }
 
-    .main-nav {
+    .site-header:not(.has-nav-toggle) .main-nav {
         flex: 1 1 100%;
         justify-content: center;
         gap: 6px;
         flex-wrap: wrap;
     }
 
-    .main-nav a {
+    .site-header:not(.has-nav-toggle) .main-nav a {
         font-size: 11px;
         padding: 8px 9px;
     }
@@ -6460,6 +6749,48 @@ body.dark-mode .suggestion-item.selected {
 
     .footer-links {
         gap: 10px;
+        position: relative;
+        padding: 24px 16px;
+        margin-left: -100vw;
+        margin-right: -100vw;
+        padding-left: calc(16px + 100vw);
+        padding-right: calc(16px + 100vw);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.65),
+                rgba(31, 27, 26, 0.65)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.06),
+                rgba(90, 70, 50, 0.06) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .footer-links::before {
+        display: none;
+    }
+
+    body.theme-dark .footer-links {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.75),
+                rgba(15, 12, 10, 0.75)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.08),
+                rgba(90, 70, 50, 0.08) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.4);
     }
 
     .decade-columns {
@@ -6495,6 +6826,10 @@ body.dark-mode .suggestion-item.selected {
 
     .carousel-arrow:last-of-type {
         right: 2px;
+    }
+
+    .site-footer {
+        overflow: visible;
     }
 }
 
@@ -6692,6 +7027,28 @@ body.dark-mode .suggestion-item.selected {
     /* Footer */
     .site-footer {
         background-image: url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.55),
+                rgba(31, 27, 26, 0.55)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        overflow: visible;
+    }
+
+    body.theme-dark .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.65),
+                rgba(15, 12, 10, 0.65)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -6728,6 +7085,48 @@ body.dark-mode .suggestion-item.selected {
         align-items: center;
         text-align: center;
         gap: 10px;
+        position: relative;
+        padding: 24px 16px;
+        margin-left: -100vw;
+        margin-right: -100vw;
+        padding-left: calc(16px + 100vw);
+        padding-right: calc(16px + 100vw);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.65),
+                rgba(31, 27, 26, 0.65)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.06),
+                rgba(90, 70, 50, 0.06) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .footer-links::before {
+        display: none;
+    }
+
+    body.theme-dark .footer-links {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.75),
+                rgba(15, 12, 10, 0.75)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.08),
+                rgba(90, 70, 50, 0.08) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.4);
     }
 
     .footer-links small {
@@ -6883,10 +7282,17 @@ body.page-studios main {
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1167px) {
     .header-inner {
         justify-content: space-between;
         align-items: center;
+    }
+
+    .site-header.has-nav-toggle #primary-nav {
+        flex: 1 0 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .brand {
@@ -6906,26 +7312,55 @@ body.page-studios main {
         justify-content: center;
         min-width: 44px;
         min-height: 44px;
-        border: 1px solid var(--white-25);
-        border-radius: 8px;
-        background: var(--overlay-brown);
-        color: var(--cream-100);
+        border: 1px solid var(--nav-toggle-border);
+        border-radius: 14px;
+        background: linear-gradient(
+            180deg,
+            var(--nav-toggle-bg-start) 0%,
+            var(--nav-toggle-bg-end) 100%
+        );
+        color: var(--nav-item-text);
         font-size: 1.2rem;
         font-weight: 700;
         cursor: pointer;
+        box-shadow: 0 10px 24px var(--nav-toggle-shadow);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .nav-toggle:hover {
+        transform: translateY(-1px);
+    }
+
+    .nav-toggle:focus-visible {
+        outline: 2px solid var(--nav-item-hover-bg);
+        outline-offset: 2px;
     }
 
     .site-header.has-nav-toggle .main-nav {
         flex: 1 1 100%;
         flex-direction: column;
         align-items: stretch;
-        gap: 6px;
-        width: 100%;
+        gap: 10px;
+        width: min(100%, 460px);
         margin-top: 0;
+        padding: 12px 12px 14px;
         max-height: 0;
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
+        border-radius: 20px;
+        background: linear-gradient(
+            180deg,
+            var(--nav-panel-bg) 0%,
+            color-mix(in srgb, var(--nav-panel-bg) 88%, transparent) 100%
+        );
+        border: 1px solid var(--nav-panel-border);
+        box-shadow: 0 18px 34px var(--nav-panel-shadow);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         transition:
             max-height 0.25s ease,
             opacity 0.2s ease,
@@ -6936,12 +7371,178 @@ body.page-studios main {
         max-height: 520px;
         opacity: 1;
         pointer-events: auto;
-        margin-top: 10px;
+        margin-top: 12px;
     }
 
     .site-header.has-nav-toggle .main-nav a {
+        width: min(100%, 320px);
+        justify-content: center;
+        text-align: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--nav-item-bg);
+        border: 1px solid var(--nav-item-border);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        color: var(--nav-item-text);
+    }
+
+    .site-header.has-nav-toggle .main-nav .nav-search-trigger {
+        width: min(100%, 320px);
+        min-height: 44px;
+        align-self: center;
+        justify-content: center;
+        text-align: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--nav-item-bg);
+        border: 1px solid var(--nav-item-border);
+        color: var(--nav-item-text);
+    }
+
+    .site-header.has-nav-toggle .main-nav a:hover {
+        background: var(--nav-item-hover-bg);
+        transform: translateY(-1px);
+    }
+
+    .site-header.has-nav-toggle .main-nav a.is-active {
+        background: var(--nav-item-active-bg);
+        border-color: var(--nav-item-active-border);
+    }
+
+    .site-header.has-nav-toggle .main-nav a::after {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+    .header-inner {
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .site-header.has-nav-toggle #primary-nav {
+        flex: 1 0 100%;
         width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .brand {
+        flex: 1 1 auto;
+        width: auto;
         justify-content: flex-start;
+        text-align: left;
+    }
+
+    .brand-title {
+        text-align: left;
+    }
+
+    .nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        border: 1px solid var(--nav-toggle-border);
+        border-radius: 14px;
+        background: linear-gradient(
+            180deg,
+            var(--nav-toggle-bg-start) 0%,
+            var(--nav-toggle-bg-end) 100%
+        );
+        color: var(--nav-item-text);
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 24px var(--nav-toggle-shadow);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .nav-toggle:hover {
+        transform: translateY(-1px);
+    }
+
+    .nav-toggle:focus-visible {
+        outline: 2px solid var(--nav-item-hover-bg);
+        outline-offset: 2px;
+    }
+
+    .site-header.has-nav-toggle .main-nav {
+        flex: 1 1 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: min(100%, 460px);
+        margin-top: 0;
+        padding: 12px 12px 14px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        border-radius: 20px;
+        background: linear-gradient(
+            180deg,
+            var(--nav-panel-bg) 0%,
+            color-mix(in srgb, var(--nav-panel-bg) 88%, transparent) 100%
+        );
+        border: 1px solid var(--nav-panel-border);
+        box-shadow: 0 18px 34px var(--nav-panel-shadow);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        transition:
+            max-height 0.25s ease,
+            opacity 0.2s ease,
+            margin-top 0.2s ease;
+    }
+
+    .site-header.has-nav-toggle.nav-open .main-nav {
+        max-height: 520px;
+        opacity: 1;
+        pointer-events: auto;
+        margin-top: 12px;
+    }
+
+    .site-header.has-nav-toggle .main-nav a {
+        width: min(100%, 320px);
+        justify-content: center;
+        text-align: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--nav-item-bg);
+        border: 1px solid var(--nav-item-border);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        color: var(--nav-item-text);
+    }
+
+    .site-header.has-nav-toggle .main-nav .nav-search-trigger {
+        width: min(100%, 320px);
+        min-height: 44px;
+        align-self: center;
+        justify-content: center;
+        text-align: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--nav-item-bg);
+        border: 1px solid var(--nav-item-border);
+        color: var(--nav-item-text);
+    }
+
+    .site-header.has-nav-toggle .main-nav a:hover {
+        background: var(--nav-item-hover-bg);
+        transform: translateY(-1px);
+    }
+
+    .site-header.has-nav-toggle .main-nav a.is-active {
+        background: var(--nav-item-active-bg);
+        border-color: var(--nav-item-active-border);
+    }
+
+    .site-header.has-nav-toggle .main-nav a::after {
+        display: none;
     }
 
     .hero p {

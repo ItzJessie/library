@@ -1,1 +1,370 @@
-/* Footer styles are defined in Site.css to match the reference design. */
+/* Footer component styles */
+
+.site-footer {
+    background:
+        linear-gradient(180deg, var(--grad-tan-1), var(--grad-tan-2)),
+        repeating-linear-gradient(
+            90deg,
+            var(--timeline-stripe),
+            var(--timeline-stripe) 2px,
+            transparent 2px,
+            transparent 10px
+        ),
+        url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+    background-size: cover, auto, cover;
+    background-position: center, center, center;
+    background-repeat: no-repeat, repeat, no-repeat;
+    color: var(--text-dark);
+    padding: 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.site-footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at 20% 30%,
+        var(--white-45),
+        transparent 60%
+    );
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+body.theme-dark .site-footer {
+    background:
+        linear-gradient(
+            180deg,
+            var(--overlay-brown-lighter),
+            var(--overlay-brown-light)
+        ),
+        repeating-linear-gradient(
+            90deg,
+            var(--timeline-stripe),
+            var(--timeline-stripe) 2px,
+            transparent 2px,
+            transparent 10px
+        ),
+        url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+    color: var(--footer-text);
+}
+
+body.theme-dark .site-footer::before {
+    background: radial-gradient(
+        circle at 20% 30%,
+        var(--overlay-brown-medium),
+        transparent 60%
+    );
+    opacity: 0.6;
+}
+
+.footer-inner {
+    max-width: none;
+    width: 100%;
+    margin: 0 auto;
+    font-family: "Shippori Mincho", serif;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-copy {
+    padding: 16px 24px 0;
+    min-height: 110px;
+}
+
+.footer-copy p {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--section-title);
+    position: relative;
+}
+
+.footer-copy span {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.7;
+    display: block;
+    margin-bottom: 0;
+    color: var(--text-gray);
+    position: relative;
+}
+
+body.theme-dark .footer-copy p {
+    color: var(--text-primary);
+}
+
+body.theme-dark .footer-copy span {
+    color: var(--text-light);
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: "Manrope", sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--footer-text);
+    padding: 12px 24px 16px;
+    margin-top: 0;
+    position: relative;
+    width: 100%;
+}
+
+.footer-links::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    background:
+        linear-gradient(180deg, var(--footer-bg-1), var(--footer-bg-2)),
+        repeating-linear-gradient(
+            45deg,
+            var(--footer-stripe),
+            var(--footer-stripe) 2px,
+            transparent 2px,
+            transparent 6px
+        );
+    border-top: 1px solid var(--footer-border);
+    box-shadow: 0 -6px 14px var(--footer-shadow);
+    z-index: -1;
+}
+
+.footer-links a {
+    margin: 0 6px;
+    color: inherit;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.theme-dark .footer-links a:hover,
+body.theme-dark .footer-links a:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.footer-actions {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: none;
+}
+
+.footer-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: center;
+    grid-column: 2;
+}
+
+/* Keep footer toggle aligned in the action grid while preserving toggle visuals. */
+.footer-actions .global-theme-toggle {
+    justify-self: end;
+    grid-column: 3;
+}
+
+@media (max-width: 720px) {
+    .site-footer {
+        padding: 20px 0;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.55),
+                rgba(31, 27, 26, 0.55)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        overflow: visible;
+    }
+
+    body.theme-dark .site-footer {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.65),
+                rgba(15, 12, 10, 0.65)
+            ),
+            url("../images/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        padding: 0 16px;
+        gap: 16px;
+    }
+
+    .footer-copy {
+        padding: 16px 16px 14px;
+        min-height: 120px;
+    }
+
+    .footer-copy p {
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        text-shadow: 0 1px 2px var(--footer-copy-shadow);
+    }
+
+    .footer-copy span {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.65;
+        color: var(--brown-800);
+        text-shadow: 0 1px 2px var(--footer-copy-shadow-soft);
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px 24px 0 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.12);
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(42, 36, 35, 0.65),
+                rgba(31, 27, 26, 0.65)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.06),
+                rgba(90, 70, 50, 0.06) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow:
+            0 -10px 22px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .footer-links::before {
+        display: none;
+    }
+
+    .footer-links::after {
+        content: "";
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        top: 8px;
+        height: 1px;
+        border-radius: 999px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 235, 205, 0.42),
+            transparent
+        );
+        pointer-events: none;
+    }
+
+    body.theme-dark .footer-links {
+        border-left-color: rgba(255, 255, 255, 0.09);
+        border-right-color: rgba(255, 255, 255, 0.09);
+        background:
+            linear-gradient(
+                180deg,
+                rgba(20, 17, 14, 0.75),
+                rgba(15, 12, 10, 0.75)
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(90, 70, 50, 0.08),
+                rgba(90, 70, 50, 0.08) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        box-shadow:
+            0 -10px 24px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    body.theme-dark .footer-links::after {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(216, 186, 148, 0.3),
+            transparent
+        );
+    }
+
+    .footer-links small {
+        font-size: 11px;
+        opacity: 0.9;
+    }
+
+    .footer-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .footer-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .footer-links a,
+    .footer-links span {
+        font-size: 12px;
+    }
+
+    .footer-links a {
+        padding: 3px 8px;
+        border-radius: 10px;
+        transition: background-color 0.25s ease;
+    }
+
+    .footer-actions .global-theme-toggle {
+        width: 100%;
+        max-width: 220px;
+        justify-content: center;
+        justify-self: center;
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 680px) {
+    .footer-links a {
+        font-size: 13px;
+    }
+
+    .footer-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

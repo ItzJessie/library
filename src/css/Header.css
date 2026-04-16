@@ -10,11 +10,13 @@
 .brand-title {
     display: block;
     line-height: 1.1;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 
 @media (max-width: 1024px) {
     .brand-title {
-        font-size: 1.2rem;
+        font-size: clamp(1.05rem, 2.1vw, 1.2rem);
     }
 }
 
@@ -32,6 +34,59 @@
 
     .brand-title {
         text-align: left;
-        font-size: 1rem;
+        font-size: clamp(0.95rem, 4vw, 1.05rem);
+    }
+
+    .site-header.has-nav-toggle #primary-nav {
+        margin-top: 0;
+    }
+
+    .site-header.has-nav-toggle .main-nav {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-title {
+        font-size: clamp(0.85rem, 4.6vw, 0.95rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-header.has-nav-toggle .main-nav,
+    .main-nav a,
+    .nav-toggle {
+        transition: none;
+    }
+}
+
+.site-header .header-inner {
+    width: 100%;
+    min-width: 0;
+}
+
+#primary-nav {
+    min-width: 0;
+}
+
+.nav-toggle {
+    line-height: 1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-toggle:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.75);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1167px) {
+    .site-header.has-nav-toggle #primary-nav {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .site-header.has-nav-toggle .main-nav {
+        width: 100%;
     }
 }
