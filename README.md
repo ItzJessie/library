@@ -2,6 +2,8 @@
 
 A React single-page application that documents major eras, studios, creators, and influential series in Japanese animation history.
 
+The client is fully responsive across mobile, tablet, and desktop layouts, with automated checks for navigation behavior and page-level rendering.
+
 ## Tech Stack
 
 - React 19
@@ -17,6 +19,16 @@ A React single-page application that documents major eras, studios, creators, an
 - Universal search overlay with filters and predictive suggestions.
 - Era-focused pages, studio/creator profiles, and influential-series exploration.
 - Mobile-first navigation with dedicated responsive validation script.
+- Responsive cards, forms, overlays, and content sections across all routes.
+
+## Recent UX Enhancements
+
+- Theme toggling now uses intentional color/elevation transitions (about 180ms) for smoother visual mode changes.
+- Mobile navigation behavior improved with outside-tap close, background scroll lock while open, and better open-panel scrolling.
+- Anime Eras section now includes cinematic era-to-era chapter-cut transitions.
+- Era loading states now use branded character silhouette loaders instead of generic placeholders.
+- Slideshow includes subtle Ken Burns motion on active slides for cinematic depth.
+- Footer and theme behavior received mobile-specific stability fixes across breakpoints.
 
 ## Routes
 
@@ -49,6 +61,22 @@ Default local URL:
 
 - `http://localhost:3000`
 
+## Quick Verification
+
+Run these checks before shipping changes:
+
+```bash
+npm test -- --watchAll=false --runInBand
+npm run build
+npm run test:nav-responsive
+```
+
+What this validates:
+
+- Unit/integration behavior for pages and components.
+- Production build health.
+- Responsive navigation behavior at configured viewport sizes.
+
 ## Available Scripts
 
 - `npm start` - Runs the app in development mode.
@@ -79,6 +107,30 @@ Optional flags:
 npm run test:nav-responsive -- --url http://127.0.0.1:3000 --viewports 320x568,768x1024 --toggle-breakpoint 1167
 ```
 
+## Responsiveness Coverage
+
+Core breakpoints used across the client:
+
+- Mobile: `<= 720px` (including compact variants around `480px`)
+- Tablet: `721px` to `1100px`
+- Desktop: `> 1100px` (mobile nav toggle behavior validated around `1167px`)
+
+Route coverage includes:
+
+- Home (`/`)
+- Anime Eras (`/anime-eras`)
+- Studios & Creators (`/studios-creators`)
+- Influential Series (`/influential-series`)
+- All Influential Series (`/all-influential-series`)
+- User Feedback (`/user-feedback`)
+- About (`/about`)
+- Dynamic decade pages (`/:decade`)
+
+Additional accessibility-responsive behavior:
+
+- `prefers-reduced-motion` fallbacks in key animated areas.
+- Touch-friendly controls for mobile navigation, forms, and interactive cards.
+
 ## Build and Deployment Notes
 
 - `package.json` uses `"homepage": "/library"` for GitHub Pages hosting.
@@ -108,7 +160,7 @@ scripts/
 Recommended local verification flow:
 
 ```bash
-npm test -- --watch=false
+npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
