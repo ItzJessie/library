@@ -11,7 +11,7 @@ jest.mock(
                 {children}
             </a>
         ),
-        NavLink: ({ to, children, className, ...props }) => {
+        NavLink: ({ to, children, className, end: _end, ...props }) => {
             const computedClass =
                 typeof className === "function" ? className({ isActive: false }) : className;
 
@@ -35,6 +35,7 @@ import Home from "../pages/home";
 import EraOverlay from "../components/EraOverlay";
 import AnimeEras from "../pages/AnimeEras";
 import { eraPanels } from "../data/siteData";
+import { ThemeProvider } from "../context/ThemeContext";
 
 const renderWithRouter = (ui) => render(ui);
 
@@ -54,7 +55,11 @@ beforeEach(() => {
 
 describe("Critical feature coverage", () => {
     test("mobile nav toggle opens and closes", async () => {
-        renderWithRouter(<Header />);
+        renderWithRouter(
+            <ThemeProvider>
+                <Header />
+            </ThemeProvider>
+        );
 
         const toggleButton = screen.getByRole("button", { name: /open menu/i });
         expect(toggleButton).toHaveAttribute("aria-expanded", "false");

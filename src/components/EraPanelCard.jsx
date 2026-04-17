@@ -32,15 +32,33 @@ const EraPanelCard = ({ era }) => {
             data-era={eraId}
             aria-labelledby={`era-panel-title-${eraId}`}
         >
-            <img
-                src={era?.image ? `${process.env.PUBLIC_URL}/${era.image}` : ""}
-                alt={era?.id ? `Anime from the ${era.id}` : "Anime era artwork"}
-                loading="lazy"
-                decoding="async"
-                className={imageLoaded ? "" : "loading"}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageLoaded(true)}
-            />
+            <div className={`era-panel__media ${imageLoaded ? "is-loaded" : ""}`.trim()}>
+                {!imageLoaded ? (
+                    <div
+                        className="era-panel__skeleton"
+                        role="status"
+                        aria-live="polite"
+                        aria-label={`Loading ${eraId} artwork`}
+                    >
+                        <div className="anime-silhouette-loader" aria-hidden="true">
+                            <span className="anime-silhouette-loader__halo"></span>
+                            <span className="anime-silhouette-loader__head"></span>
+                            <span className="anime-silhouette-loader__hair"></span>
+                            <span className="anime-silhouette-loader__torso"></span>
+                            <span className="anime-silhouette-loader__blade"></span>
+                        </div>
+                    </div>
+                ) : null}
+                <img
+                    src={era?.image ? `${process.env.PUBLIC_URL}/${era.image}` : ""}
+                    alt={era?.id ? `Anime from the ${era.id}` : "Anime era artwork"}
+                    loading="lazy"
+                    decoding="async"
+                    className={imageLoaded ? "" : "loading"}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                />
+            </div>
             <h3 id={`era-panel-title-${eraId}`}>{eraId}</h3>
             <div className="era-panel__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" aria-hidden="true">

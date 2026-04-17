@@ -1,16 +1,17 @@
 .global-theme-toggle {
+    --theme-toggle-transition-ms: var(--theme-transition-ms, 180ms);
     position: relative;
     z-index: 1;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 8px 12px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(25, 17, 12, 0.78);
     color: #f4e9da;
     font-family: "Manrope", sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.13em;
     text-transform: uppercase;
@@ -21,10 +22,14 @@
     justify-self: end;
     grid-column: 3;
     transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease,
-        color 0.2s ease;
+        transform var(--theme-toggle-transition-ms) ease,
+        box-shadow var(--theme-toggle-transition-ms) ease,
+        background-color var(--theme-toggle-transition-ms) ease,
+        color var(--theme-toggle-transition-ms) ease;
+}
+
+.global-theme-toggle__cue {
+    opacity: 0.86;
 }
 
 body:not(.theme-dark) .global-theme-toggle {
@@ -54,9 +59,10 @@ body:not(.theme-dark) .global-theme-toggle {
 }
 
 .global-theme-toggle__label {
-    min-width: 4ch;
+    min-width: 4.5ch;
     text-align: right;
-    transition: color 0.2s ease;
+    font-weight: 800;
+    transition: color var(--theme-toggle-transition-ms) ease;
 }
 
 .global-theme-toggle__track {
@@ -77,8 +83,8 @@ body:not(.theme-dark) .global-theme-toggle {
     background: #f8efe2;
     transform: translateX(0);
     transition:
-        transform 0.2s ease,
-        background-color 0.2s ease;
+        transform var(--theme-toggle-transition-ms) ease,
+        background-color var(--theme-toggle-transition-ms) ease;
 }
 
 body:not(.theme-dark) .global-theme-toggle__label {

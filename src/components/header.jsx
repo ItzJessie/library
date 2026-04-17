@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../css/Header.css";
 import Navigation from "./Navigation";
+import ThemeToggle from "./ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
 
 const Header = ({ onOpenSearch = () => {} }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const headerRef = useRef(null);
     const location = useLocation();
 
     useEffect(() => {
@@ -37,6 +39,35 @@ const Header = ({ onOpenSearch = () => {} }) => {
         return () => document.removeEventListener("keydown", closeOnEscape);
     }, [menuOpen]);
 
+    useEffect(() => {
+        if (!menuOpen) {
+            return undefined;
+        }
+
+        const closeOnOutsidePointer = (event) => {
+            if (!headerRef.current) {
+                return;
+            }
+
+            if (!headerRef.current.contains(event.target)) {
+                setMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("pointerdown", closeOnOutsidePointer);
+        return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    }, [menuOpen]);
+
+    useEffect(() => {
+        const shouldLockScroll = menuOpen && window.innerWidth <= 1167;
+
+        document.body.classList.toggle("nav-menu-open", shouldLockScroll);
+
+        return () => {
+            document.body.classList.remove("nav-menu-open");
+        };
+    }, [menuOpen]);
+
     const closeMenu = () => setMenuOpen(false);
 
     const headerClass = [
@@ -48,7 +79,7 @@ const Header = ({ onOpenSearch = () => {} }) => {
         .join(" ");
 
     return (
-        <header className={headerClass}>
+        <header className={headerClass} ref={headerRef}>
             <div className="header-inner">
                 <Link
                     className="brand"
@@ -77,6 +108,9 @@ const Header = ({ onOpenSearch = () => {} }) => {
                 >
                     <span aria-hidden="true">{menuOpen ? "\u2715" : "\u2630"}</span>
                 </button>
+                <div className="header-theme-toggle">
+                    <ThemeToggle />
+                </div>
                 <div id="primary-nav">
                     <Navigation onNavigate={closeMenu} onOpenSearch={onOpenSearch} />
                 </div>

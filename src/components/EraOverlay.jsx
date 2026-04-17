@@ -578,8 +578,15 @@ const EraOverlay = ({
                                                         <div className="detail-extra-stack">
                                                             {loading && (
                                                                 <div className="loading-state">
+                                                                    <div className="anime-silhouette-loader" aria-hidden="true">
+                                                                        <span className="anime-silhouette-loader__halo"></span>
+                                                                        <span className="anime-silhouette-loader__head"></span>
+                                                                        <span className="anime-silhouette-loader__hair"></span>
+                                                                        <span className="anime-silhouette-loader__torso"></span>
+                                                                        <span className="anime-silhouette-loader__blade"></span>
+                                                                    </div>
                                                                     <p className="loading-text">
-                                                                        Loading details...
+                                                                        Summoning character dossier...
                                                                     </p>
                                                                 </div>
                                                             )}
@@ -675,8 +682,15 @@ const EraOverlay = ({
                                                     <div className="detail-extra-stack">
                                                         {loading && (
                                                             <div className="loading-state">
+                                                                <div className="anime-silhouette-loader" aria-hidden="true">
+                                                                    <span className="anime-silhouette-loader__halo"></span>
+                                                                    <span className="anime-silhouette-loader__head"></span>
+                                                                    <span className="anime-silhouette-loader__hair"></span>
+                                                                    <span className="anime-silhouette-loader__torso"></span>
+                                                                    <span className="anime-silhouette-loader__blade"></span>
+                                                                </div>
                                                                 <p className="loading-text">
-                                                                    Loading details...
+                                                                    Summoning character dossier...
                                                                 </p>
                                                             </div>
                                                         )}

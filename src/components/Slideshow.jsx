@@ -258,7 +258,11 @@ const Slideshow = ({ slides }) => {
                 onTransitionEnd={handleTrackTransitionEnd}
             >
                 {displayedSlides.map((series, index) => (
-                    <article className="carousel-card tilt-card" data-series-id={series.id} key={`${series.id}-${index}`}>
+                    <article
+                        className={`carousel-card tilt-card ${index === slideIndex ? "is-current" : ""}`.trim()}
+                        data-series-id={series.id}
+                        key={`${series.id}-${index}`}
+                    >
                         <img src={series.image} alt={series.title} loading="lazy" decoding="async" />
                         <div className="carousel-card__shade" aria-hidden="true"></div>
                         <div className="carousel-card__content">

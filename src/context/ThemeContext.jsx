@@ -1,7 +1,25 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from "react";
 
 const ThemeContext = createContext(undefined);
 const THEME_STORAGE_KEY = "theme";
+const THEME_TRANSITION_MS = 180;
+const THEME_TRANSITION_CLASS = "theme-transitioning";
+
+const shouldAnimateThemeTransition = () => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+        return false;
+    }
+
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+};
 
 const readStoredTheme = () => {
     if (typeof window === "undefined") {
@@ -30,6 +48,31 @@ const getPreferredTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(getPreferredTheme);
+    const transitionTimeoutRef = useRef(null);
+
+    const runThemeTransitionWindow = useCallback(() => {
+        if (!shouldAnimateThemeTransition()) {
+            return;
+        }
+
+        if (transitionTimeoutRef.current) {
+            window.clearTimeout(transitionTimeoutRef.current);
+            transitionTimeoutRef.current = null;
+        }
+
+        document.documentElement.style.setProperty(
+            "--theme-transition-ms",
+            `${THEME_TRANSITION_MS}ms`
+        );
+        document.documentElement.classList.add(THEME_TRANSITION_CLASS);
+        document.body.classList.add(THEME_TRANSITION_CLASS);
+
+        transitionTimeoutRef.current = window.setTimeout(() => {
+            document.documentElement.classList.remove(THEME_TRANSITION_CLASS);
+            document.body.classList.remove(THEME_TRANSITION_CLASS);
+            transitionTimeoutRef.current = null;
+        }, THEME_TRANSITION_MS);
+    }, []);
 
     useEffect(() => {
         const isDark = theme === "dark";
@@ -45,14 +88,32 @@ export const ThemeProvider = ({ children }) => {
         }
     }, [theme]);
 
+    useEffect(
+        () => () => {
+            if (transitionTimeoutRef.current) {
+                window.clearTimeout(transitionTimeoutRef.current);
+                transitionTimeoutRef.current = null;
+            }
+
+            document.documentElement.classList.remove(THEME_TRANSITION_CLASS);
+            document.body.classList.remove(THEME_TRANSITION_CLASS);
+        },
+        []
+    );
+
+    const toggleTheme = useCallback(() => {
+        runThemeTransitionWindow();
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    }, [runThemeTransitionWindow]);
+
     const value = useMemo(
         () => ({
             theme,
             isDarkMode: theme === "dark",
             setTheme,
-            toggleTheme: () => setTheme((prev) => (prev === "dark" ? "light" : "dark"))
+            toggleTheme
         }),
-        [theme]
+        [theme, toggleTheme]
     );
 
     return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

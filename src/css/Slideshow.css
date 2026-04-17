@@ -145,6 +145,38 @@ body.theme-dark .series-carousel {
     display: block;
     object-fit: cover;
     filter: brightness(0.63) saturate(1.05);
+    transform: scale(1);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.series-carousel .carousel-card.is-current img {
+    animation: carousel-kenburns-right var(--carousel-interval, 5000ms)
+        cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+
+.series-carousel .carousel-card.is-current:nth-child(even) img {
+    animation-name: carousel-kenburns-left;
+}
+
+@keyframes carousel-kenburns-right {
+    from {
+        transform: scale(1.04) translate3d(-1.2%, -0.8%, 0);
+    }
+
+    to {
+        transform: scale(1.11) translate3d(1.2%, 0.8%, 0);
+    }
+}
+
+@keyframes carousel-kenburns-left {
+    from {
+        transform: scale(1.04) translate3d(1.2%, -0.8%, 0);
+    }
+
+    to {
+        transform: scale(1.11) translate3d(-1.2%, 0.8%, 0);
+    }
 }
 
 .series-carousel .carousel-card__shade {
@@ -375,6 +407,11 @@ body.theme-dark .series-carousel {
     .series-carousel .carousel-dot__progress {
         animation: none;
         transform: scaleX(1);
+    }
+
+    .series-carousel .carousel-card.is-current img {
+        animation: none;
+        transform: scale(1);
     }
 
     .series-carousel .carousel-shell,

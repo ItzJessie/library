@@ -1,0 +1,13 @@
+
+> library@0.1.0 test
+> react-scripts test --watchAll=false --runInBand src/__tests__/era-panel-card.test.jsx src/__tests__/era-overlay.test.jsx src/__tests__/critical-features.test.jsx
+
+PASS src/__tests__/critical-features.test.jsx (7.843 s)
+PASS src/__tests__/era-overlay.test.jsx
+PASS src/__tests__/era-panel-card.test.jsx
+
+Test Suites: 3 passed, 3 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        11.962 s
+Ran all test suites matching /src\/__tests__\/era-panel-card.test.jsx|src\/__tests__\/era-overlay.test.jsx|src\/__tests__\/critical-features.test.jsx/i.

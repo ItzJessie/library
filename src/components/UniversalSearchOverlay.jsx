@@ -181,7 +181,7 @@ const UniversalSearchOverlay = ({ isOpen, onClose, onPreviewUpdate }) => {
                         placeholder="Try: show me 90s psychological anime"
                         aria-label="Universal search"
                     />
-                    <span className="universal-search-shortcut">Press / to open</span>
+                    <span className="universal-search-shortcut">Type to explore instantly</span>
                 </div>
 
                 {showSuggestions && (

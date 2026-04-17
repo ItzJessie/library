@@ -23,9 +23,10 @@ const Navigation = ({ onNavigate = noop, onOpenSearch = noop }) => {
                 type="button" 
                 onClick={handleSearchClick} 
                 aria-label="Open universal search"
-                title="Open search (Press / to search)"
+                title="Open universal search"
             >
-                <span className="search-text-full">Search /</span>
+                <span className="search-icon" aria-hidden="true"></span>
+                <span className="search-text-full">Search</span>
                 <span className="search-text-short">Search</span>
             </button>
         </nav>
