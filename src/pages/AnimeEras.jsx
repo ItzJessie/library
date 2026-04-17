@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { eraPanels } from "../data/siteData";
 import "../css/AnimeErasPage.css";
@@ -8,7 +8,9 @@ import { useEraInteractions } from "../hooks/useEraInteractions";
 
 const AnimeEras = () => {
     const [activeEra, setActiveEra] = useState(null);
+    const [chapterCut, setChapterCut] = useState(null);
     const { openOverlay, closeOverlay } = useEraInteractions();
+    const chapterCutIdRef = useRef(0);
     const orderedEraIds = eraPanels.map((era) => era.id);
     const eraGalleryCards = [
         {
@@ -56,6 +58,14 @@ const AnimeEras = () => {
     ];
 
     const handleEraClick = (eraId) => {
+        if (activeEra && activeEra !== eraId) {
+            chapterCutIdRef.current += 1;
+            setChapterCut({
+                id: chapterCutIdRef.current,
+                label: `${activeEra} to ${eraId}`
+            });
+        }
+
         const overlayElement = document.querySelector(
             `[data-era="${eraId}"].era-overlay`
         );
@@ -80,6 +90,18 @@ const AnimeEras = () => {
             return;
         }
 
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        if (!prefersReducedMotion && activeEra && activeEra !== targetEraId) {
+            chapterCutIdRef.current += 1;
+            setChapterCut({
+                id: chapterCutIdRef.current,
+                label: `${activeEra} to ${targetEraId}`
+            });
+        }
+
         const overlayElement = document.querySelector(
             `[data-era="${targetEraId}"].era-overlay`
         );
@@ -92,6 +114,23 @@ const AnimeEras = () => {
 
     return (
         <>
+            {chapterCut ? (
+                <div
+                    key={chapterCut.id}
+                    className="era-chapter-cut"
+                    aria-hidden="true"
+                    onAnimationEnd={() => {
+                        setChapterCut((current) =>
+                            current && current.id === chapterCut.id ? null : current
+                        );
+                    }}
+                >
+                    <span className="era-chapter-cut__label">
+                        Chapter Cut: {chapterCut.label}
+                    </span>
+                </div>
+            ) : null}
+
             <main className="page-eras decorative-element-container">
                 {/* Japanese Decorative Elements - Cherry Blossoms */}
                 <svg className="decorative-sakura" viewBox="0 0 100 100" width="60" height="60" style={{ top: "10%", left: "5%" }}>
