@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/library/static/css/main.5228eb61.css",
-    "main.js": "/library/static/js/main.10409421.js",
+    "main.css": "/library/static/css/main.7f356889.css",
+    "main.js": "/library/static/js/main.4c24436d.js",
     "static/media/Background_Color.png": "/library/static/media/Background_Color.7ab2a4a59e0004b89d31.png",
     "static/media/body-texture.png": "/library/static/media/body-texture.7ab2a4a59e0004b89d31.png",
     "static/media/vintage-japanese-postage-stamp-traditional-design_923209-2358 1.png": "/library/static/media/vintage-japanese-postage-stamp-traditional-design_923209-2358 1.7f6ac1cdd58b35efb392.png",
     "static/media/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.png": "/library/static/media/beautiful-city-landscape-background-cartoon-summer-sunset-with-clouds-anime-style-photo 1.daa02086fa33d5e8784b.png",
     "static/media/ 1.png": "/library/static/media/8cdda872fb16d0f0e09652bc6ec37728 1.9ff9dd68e51ce9c86523.png",
     "index.html": "/library/index.html",
-    "main.5228eb61.css.map": "/library/static/css/main.5228eb61.css.map",
-    "main.10409421.js.map": "/library/static/js/main.10409421.js.map"
+    "main.7f356889.css.map": "/library/static/css/main.7f356889.css.map",
+    "main.4c24436d.js.map": "/library/static/js/main.4c24436d.js.map"
   },
   "entrypoints": [
-    "static/css/main.5228eb61.css",
-    "static/js/main.10409421.js"
+    "static/css/main.7f356889.css",
+    "static/js/main.4c24436d.js"
   ]
 }
