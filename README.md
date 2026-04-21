@@ -1,6 +1,6 @@
 # Japanese Animation History Archive
 
-A React single-page app that explores the history of Japanese animation through era timelines, studio and creator spotlights, and influential series collections.
+A React single-page app that explored the history of Japanese animation through era timelines, studio and creator spotlights, and influential series collections.
 
 The app is built for responsive use across mobile, tablet, and desktop, with both component tests and a Playwright navigation-responsiveness check.
 
