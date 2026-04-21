@@ -1,13 +1,87 @@
 
 > library@0.1.0 test
-> react-scripts test --watchAll=false --runInBand src/__tests__/era-panel-card.test.jsx src/__tests__/era-overlay.test.jsx src/__tests__/critical-features.test.jsx
+> react-scripts test --watchAll=false
 
-PASS src/__tests__/critical-features.test.jsx (7.843 s)
+PASS src/__tests__/universal-search-overlay.test.jsx
+PASS src/__tests__/decade-page.test.jsx
+PASS src/__tests__/influential-series-page.test.jsx
+PASS src/__tests__/user-feedback-page.test.jsx
+PASS src/__tests__/header-component.test.jsx
 PASS src/__tests__/era-overlay.test.jsx
-PASS src/__tests__/era-panel-card.test.jsx
+PASS src/__tests__/profile-card.test.jsx
+PASS src/__tests__/about-page.test.jsx
+PASS src/__tests__/slideshow-component.test.jsx
+PASS src/__tests__/navigation-component.test.jsx
+PASS src/__tests__/footer-component.test.jsx
+PASS src/__tests__/series-list-card.test.jsx
+PASS src/__tests__/studios-creators-page.test.jsx (5.297 s)
+  ● Console
 
-Test Suites: 3 passed, 3 total
-Tests:       14 passed, 14 total
+    console.error
+      An update to StudiosCreators inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      518 |             } catch (error) {
+      519 |                 if (error.name !== "AbortError") {
+    > 520 |                     setConnectedAnime(profile.related);
+          |                     ^
+      521 |                 }
+      522 |             } finally {
+      523 |                 if (!controller.signal.aborted) {
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at setConnectedAnime (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at fetchConnectedAnime (src/pages/StudiosCreators.jsx:520:21)
+
+    console.error
+      An update to StudiosCreators inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      522 |             } finally {
+      523 |                 if (!controller.signal.aborted) {
+    > 524 |                     setIsLoadingConnectedAnime(false);
+          |                     ^
+      525 |                 }
+      526 |             }
+      527 |         };
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at setIsLoadingConnectedAnime (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at fetchConnectedAnime (src/pages/StudiosCreators.jsx:524:21)
+
+PASS src/__tests__/home-feature-card.test.jsx
+PASS src/__tests__/home-archive-card.test.jsx
+PASS src/__tests__/theme-toggle-component.test.jsx
+PASS src/__tests__/era-panel-card.test.jsx
+PASS src/__tests__/feedback-summary-card.test.jsx
+PASS src/__tests__/critical-features.test.jsx (6.079 s)
+
+Test Suites: 19 passed, 19 total
+Tests:       69 passed, 69 total
 Snapshots:   0 total
-Time:        11.962 s
-Ran all test suites matching /src\/__tests__\/era-panel-card.test.jsx|src\/__tests__\/era-overlay.test.jsx|src\/__tests__\/critical-features.test.jsx/i.
+Time:        8.172 s
+Ran all test suites.

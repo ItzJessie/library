@@ -1,69 +1,66 @@
-# Japanese Animation History Archive (Client)
+# Japanese Animation History Archive
 
-A React single-page application that documents major eras, studios, creators, and influential series in Japanese animation history.
+A React single-page app that explores the history of Japanese animation through era timelines, studio and creator spotlights, and influential series collections.
 
-The client is fully responsive across mobile, tablet, and desktop layouts, with automated checks for navigation behavior and page-level rendering.
+The app is built for responsive use across mobile, tablet, and desktop, with both component tests and a Playwright navigation-responsiveness check.
 
-## Tech Stack
+## Stack
 
 - React 19
 - React Router 7 (`HashRouter`)
-- React Scripts 5 (Create React App toolchain)
-- Testing Library + Jest
-- Playwright (custom responsive navigation check)
+- Create React App toolchain (`react-scripts` 5)
+- Jest + Testing Library
+- Playwright (custom script for nav responsiveness)
 
-## Key Features
+## Highlights
 
-- Multi-page client experience with nested routes and a shared layout.
-- Theme system (light/dark) with `localStorage` persistence.
-- Universal search overlay with filters and predictive suggestions.
-- Era-focused pages, studio/creator profiles, and influential-series exploration.
-- Mobile-first navigation with dedicated responsive validation script.
-- Responsive cards, forms, overlays, and content sections across all routes.
-
-## Recent UX Enhancements
-
-- Theme toggling now uses intentional color/elevation transitions (about 180ms) for smoother visual mode changes.
-- Mobile navigation behavior improved with outside-tap close, background scroll lock while open, and better open-panel scrolling.
-- Anime Eras section now includes cinematic era-to-era chapter-cut transitions.
-- Era loading states now use branded character silhouette loaders instead of generic placeholders.
-- Slideshow includes subtle Ken Burns motion on active slides for cinematic depth.
-- Footer and theme behavior received mobile-specific stability fixes across breakpoints.
+- Shared route layout with page-level experiences for eras, creators, and series.
+- Light/dark theme support with persisted state.
+- Universal search overlay with preview support.
+- Dynamic decade route (`/:decade`) for archive-style browsing.
+- Responsive navigation with automated viewport validation and screenshots.
 
 ## Routes
 
-Top-level route shell is defined in `src/index.js` and `src/Layout.jsx`.
+Defined in `src/index.js` with shared layout in `src/Layout.jsx`:
 
 - `/` - Home
 - `/anime-eras` - Anime Eras
 - `/studios-creators` - Studios & Creators
 - `/influential-series` - Influential Series
-- `/all-influential-series` - Expanded series archive
-- `/user-feedback` - User Feedback Page
+- `/all-influential-series` - All Influential Series
+- `/user-feedback` - User Feedback
 - `/about` - About
-- `/:decade` - Dynamic decade page (for example `/1980s`)
+- `/:decade` - Decade page (example: `/1980s`)
 
 ## Getting Started
 
-### 1) Install dependencies
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2) Start development server
+2. Start the dev server:
 
 ```bash
 npm start
 ```
 
-Default local URL:
+Default URL: `http://localhost:3000`
 
-- `http://localhost:3000`
+## Scripts
 
-## Quick Verification
+- `npm start` - Run development server.
+- `npm test` - Run Jest tests in watch mode.
+- `npm run build` - Create a production build in `build/`.
+- `npm run test:nav-responsive` - Run Playwright nav checks and save screenshots to `responsive-reports/`.
+- `npm run predeploy` - Build before deploy.
+- `npm run deploy` - Deploy `build/` to GitHub Pages.
 
-Run these checks before shipping changes:
+## Recommended Verification
+
+Run before shipping:
 
 ```bash
 npm test -- --watchAll=false --runInBand
@@ -71,33 +68,20 @@ npm run build
 npm run test:nav-responsive
 ```
 
-What this validates:
+This validates:
 
-- Unit/integration behavior for pages and components.
-- Production build health.
-- Responsive navigation behavior at configured viewport sizes.
+- Component/page behavior (Jest + Testing Library).
+- Production build integrity.
+- Navigation responsiveness across configured viewport sizes.
 
-## Available Scripts
+## Responsive Navigation Check
 
-- `npm start` - Runs the app in development mode.
-- `npm run build` - Creates an optimized production build in `build/`.
-- `npm test` - Runs unit/integration tests with Jest.
-- `npm run test:nav-responsive` - Runs Playwright-based nav responsiveness checks and stores screenshots in `responsive-reports/`.
-- `npm run deploy` - Builds and deploys to GitHub Pages (`gh-pages -d build`).
+The script in `scripts/check-nav-responsive.mjs` defaults to `http://127.0.0.1:3000`.
 
-## Responsive Navigation Test
-
-The custom responsive test expects a running app URL (defaults to `http://127.0.0.1:3000`).
-
-Terminal 1:
+Run app and check in separate terminals:
 
 ```bash
 npm start
-```
-
-Terminal 2:
-
-```bash
 npm run test:nav-responsive
 ```
 
@@ -107,76 +91,37 @@ Optional flags:
 npm run test:nav-responsive -- --url http://127.0.0.1:3000 --viewports 320x568,768x1024 --toggle-breakpoint 1167
 ```
 
-## Responsiveness Coverage
-
-Core breakpoints used across the client:
-
-- Mobile: `<= 720px` (including compact variants around `480px`)
-- Tablet: `721px` to `1100px`
-- Desktop: `> 1100px` (mobile nav toggle behavior validated around `1167px`)
-
-Route coverage includes:
-
-- Home (`/`)
-- Anime Eras (`/anime-eras`)
-- Studios & Creators (`/studios-creators`)
-- Influential Series (`/influential-series`)
-- All Influential Series (`/all-influential-series`)
-- User Feedback (`/user-feedback`)
-- About (`/about`)
-- Dynamic decade pages (`/:decade`)
-
-Additional accessibility-responsive behavior:
-
-- `prefers-reduced-motion` fallbacks in key animated areas.
-- Touch-friendly controls for mobile navigation, forms, and interactive cards.
-
-## Build and Deployment Notes
-
-- `package.json` uses `"homepage": "/library"` for GitHub Pages hosting.
-- Routing uses `HashRouter`, which is compatible with static hosting.
-- Deploy pipeline:
-	1. `npm run predeploy` (build)
-	2. `npm run deploy`
-
-## Project Structure (Client)
-
-```text
-src/
-	components/      Reusable UI components
-	context/         React context providers (theme)
-	css/             Page/component styles
-	data/            Static datasets and site metadata
-	hooks/           Custom hooks
-	pages/           Route-level page components
-	utils/           Utility modules (search, helpers)
-	__tests__/       Jest + Testing Library suites
-scripts/
-	check-nav-responsive.mjs
-```
-
-## Quality Checks
-
-Recommended local verification flow:
-
-```bash
-npm test -- --watchAll=false --runInBand
-npm run build
-```
-
-If you are preparing a deployment, also run:
-
-```bash
-npm run test:nav-responsive
-```
-
-## Troubleshooting
-
-- If port `3000` is already in use, React Scripts prompts for another port.
-- If Playwright is missing browser binaries, run:
+If Playwright browser binaries are not installed:
 
 ```bash
 npx playwright install chromium
 ```
 
-- If GitHub Pages assets load incorrectly, confirm `homepage` in `package.json` matches the repo path.
+## Deployment Notes
+
+- GitHub Pages path is set via `"homepage": "/library"` in `package.json`.
+- `HashRouter` is used for static-host compatibility.
+- Deploy flow: `npm run predeploy` then `npm run deploy`.
+
+## Project Structure
+
+```text
+src/
+  components/   Reusable UI components
+  context/      Theme context and global state
+  css/          Shared and page-specific styles
+  data/         Static content/data sources
+  hooks/        Custom hooks
+  pages/        Route-level pages
+  utils/        Utility logic
+  __tests__/    Jest and Testing Library tests
+scripts/
+  check-nav-responsive.mjs
+public/
+  Static assets and HTML templates
+```
+
+## Troubleshooting
+
+- If port `3000` is in use, React Scripts will offer another port.
+- If deploy assets do not resolve, verify the `homepage` value in `package.json`.

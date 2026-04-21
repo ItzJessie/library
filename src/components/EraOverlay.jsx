@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import animeSeries from "../data/animeSeries.json";
 
 const SHEET_CLOSE_THRESHOLD = 96;
@@ -66,6 +66,26 @@ const EraOverlay = ({
 
     const API_URL = resolveApiBaseUrl();
 
+    const handleClose = useCallback(() => {
+        requestIdRef.current += 1;
+        setSheetOffset(0);
+        sheetOffsetRef.current = 0;
+        sheetStartYRef.current = null;
+        setSelectedSeriesExpanded(false);
+        setLoading(false);
+        setError(null);
+        onClose();
+    }, [onClose]);
+
+    const handleBackToList = useCallback(() => {
+        requestIdRef.current += 1;
+        setSelectedSeries(null);
+        setSeriesDetails(null);
+        setError(null);
+        setLoading(false);
+        setSelectedSeriesExpanded(false);
+    }, []);
+
     useEffect(() => {
         if (!isOpen) return;
 
@@ -84,7 +104,7 @@ const EraOverlay = ({
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [isOpen, era, onClose, selectedSeries]);
+    }, [isOpen, era, handleBackToList, handleClose, selectedSeries]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -143,17 +163,6 @@ const EraOverlay = ({
             removeListener();
         };
     }, [isOpen, era.id]);
-
-    const handleClose = () => {
-        requestIdRef.current += 1;
-        setSheetOffset(0);
-        sheetOffsetRef.current = 0;
-        sheetStartYRef.current = null;
-        setSelectedSeriesExpanded(false);
-        setLoading(false);
-        setError(null);
-        onClose();
-    };
 
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -286,15 +295,6 @@ const EraOverlay = ({
         setError(null);
         setSelectedSeriesExpanded(false);
         fetchSeriesDetails(series.title);
-    };
-
-    const handleBackToList = () => {
-        requestIdRef.current += 1;
-        setSelectedSeries(null);
-        setSeriesDetails(null);
-        setError(null);
-        setLoading(false);
-        setSelectedSeriesExpanded(false);
     };
 
     const toggleSection = (sectionName) => {
